@@ -8,7 +8,7 @@ contract OneVote {
 
 
 //events
-    //emitted when citizen is created showing new citizen's name, indexed citizen's address zip code, date approved, 
+    //emitted when citizen is created showing new citizen's name, indexed citizen's address zip code, date approved
 
     struct Citizen {
         uint256 stateId;
