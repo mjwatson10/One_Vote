@@ -1,0 +1,25 @@
+{
+  "name": "one_vote",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjwatson10/One_Vote.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mjwatson10/One_Vote/issues"
+  },
+  "homepage": "https://github.com/mjwatson10/One_Vote#readme",
+  "dependencies": {
+    "truffle-assertions": "^0.9.2"
+  }
+}
