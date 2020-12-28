@@ -14,20 +14,42 @@ contract OneVote {
     //emitted when citizen is assigned to a corresponding address
     event Assigned(address from, address to, uint256 tokenId);
 
+//structs
     struct Citizen {
         uint256 stateId;
         string name;
-        uint256 dateOfBirth;
+        string dateOfBirth;
         uint256 zipCode;
         uint256 dateApproved;
         bool citizenship;
     }
 
+    struct Candidate {
+        uint256 stateId;
+        string name;
+        string dateOfBirth;
+        string office;
+        string electionStart;
+        string electionEnd;
+        uint256 dateApproved
+    }
+
+    struct Election {
+        string office;
+        string electionStart;
+        string electionEnd;
+    }
+
+
+//arrays
     Citizen[] citizens;
+    Candidate[] candidates;
+    Election[] elections;
 
 
     mapping(uint256 => address) public citizenIndexToOwner;
     mapping(uint256 => bool) private stateIdInUse;
+    mapping(address => bool) private addressInUse;
 
 
 //function
@@ -36,11 +58,12 @@ contract OneVote {
     //a citizen cannot have the same stateId as another citizen
     function _createCitizen(
             string memory _name,
-            uint256 _dateOfBirth,
+            string memory _dateOfBirth,
             uint256 _zipCode,
             uint256 _stateId
         ) internal returns (uint256){
           require(stateIdInUse[_stateId] == false, "State ID is already assigned to a citizen");
+          require(addressInUse[msg.sender] == false, "Address is already assigned to a citizen");
 
             Citizen memory _citizen = Citizen({
                 stateId: _stateId,
@@ -55,6 +78,7 @@ contract OneVote {
             uint256 newCitizenId = citizens.length - 1;
 
             stateIdInUse[_stateId] = true;
+            addressInUse[msg.sender] = true;
 
             emit CitizenAdded(msg.sender, newCitizenId, _stateId, _zipCode);
 
@@ -68,7 +92,7 @@ contract OneVote {
       //must be internal to prevent data being seen by unwanted users
       function _getCitizen(uint256 _citizenId)internal view returns(
             string memory name,
-            uint256 dateOfBirth,
+            string memory dateOfBirth,
             uint256 zipCode
           )
       {
@@ -84,5 +108,29 @@ contract OneVote {
         citizenIndexToOwner[_tokenId] = _to;
 
         emit Assigned(_from, _to, _tokenId);
+      }
+
+
+      //create a candidate that will be used for elections
+      //all candidates must be citizens
+      //emit event when canidiate is created
+      function _createCandidate(uint256 stateId, uint32 age, string memory officeTitle, uint256 officeId) internal returns(uint256){
+        require(stateIdInUse[stateId] == true);
+
+        return candidateId;
+      }
+
+
+      //create an office for candidates to run for election
+      //emit event when office is created
+      //will need array for zipcode if office covers multiple zipcodes
+      function _createOffice(string memory officeTitle, uint256 _zipCode) internal returns(uint256){
+        return officeId;
+      }
+
+      //emit event when law is _create
+      //will need array for zipcodes
+      function _createALaw(string memory law, uint _zipCode) internal returns(uint256){
+        return lawId;
       }
 }

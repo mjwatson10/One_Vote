@@ -7,7 +7,7 @@ contract Test is OneVote {
 
   function createCitizen(
     string memory _name,
-    uint256 _dateOfBirth,
+    string memory _dateOfBirth,
     uint256 _zipCode,
     uint256 _stateId
     ) public returns (uint256){
@@ -15,12 +15,12 @@ contract Test is OneVote {
     }
 
 
-  /* function getCitizen(uint256 _citizenId) public view retruns(string memory name, uint256 dateOfBirth, uint256 zipCode){
-    retrun _getCitizen(_citizenId);
-  } */
+  function getCitizen(uint256 _citizenId) public view returns(string memory name, string memory dateOfBirth, uint256 zipCode){
+    return _getCitizen(_citizenId);
+  }
 
 
-  function assignCitizenIdToAddress(address _from, address _to, uint256 _tokenId) public {
-    _assignCitizenIdToAddress(_from, _to, _tokenId);
+  function addressAssignedToId(uint256 _tokenId) public view returns(address){
+    return citizenIndexToOwner[_tokenId];
   }
 }
