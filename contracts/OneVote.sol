@@ -33,7 +33,7 @@ contract OneVote{
     struct Citizen {
         uint256 stateId;
         string name;
-        uint64 dateOfBirth;
+        int64 dateOfBirth;
         uint256 zipCode;
         uint64 dateApproved;
         bool citizenship;
@@ -42,7 +42,7 @@ contract OneVote{
 
     struct Candidate {
         string name;
-        uint64 dateOfBirth;
+        int64 dateOfBirth;
         string officeTitle;
         uint64 electionStart;
         uint64 electionEnd;
@@ -52,11 +52,11 @@ contract OneVote{
     }
 
     struct Office {
-      string officeTitle;
-      uint256 zipCode;
-      uint64 requiredAge;
-      uint64 dateApproved;
-      uint256 officeId;
+        string officeTitle;
+        uint256 zipCode;
+        int64 requiredAge;
+        uint64 dateApproved;
+        uint256 officeId;
     }
 
     struct Election {
@@ -110,7 +110,7 @@ contract OneVote{
     //a citizen cannot have the same stateId as another citizen
     function _createCitizen(
             string memory _name,
-            uint64 _dateOfBirth,
+            int64 _dateOfBirth,
             uint256 _zipCode,
             uint256 _stateId
         ) internal returns (uint256){
@@ -146,7 +146,7 @@ contract OneVote{
       //must be internal to prevent data being seen by unwanted users
       function _getCitizen(uint256 _citizenId)internal view returns(
             string memory _name,
-            uint64 _dateOfBirth,
+            int64 _dateOfBirth,
             uint256 _zipCode
           )
       {
@@ -225,7 +225,7 @@ contract OneVote{
       function createOffice(
               string memory _officeTitle,
               uint256 _zipCode,
-              uint64 _requiredAge
+              int64 _requiredAge
           ) public returns(uint256){
 
             Office memory _office = Office({
@@ -251,7 +251,7 @@ contract OneVote{
       function getOffice(uint256 _officeId) public view returns(
             string memory officeTitle,
             uint256 zipCode,
-            uint64 requiredAge
+            int64 requiredAge
           )
         {
           Office storage office = offices[_officeId];
