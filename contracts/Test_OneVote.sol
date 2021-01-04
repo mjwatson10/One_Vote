@@ -7,7 +7,7 @@ contract Test is OneVote {
 
   function createCitizen(
     string memory _name,
-    string memory _dateOfBirth,
+    uint64 _dateOfBirth,
     uint256 _zipCode,
     uint256 _stateId
     ) public returns (uint256){
@@ -15,7 +15,7 @@ contract Test is OneVote {
     }
 
 
-  function getCitizen(uint256 _citizenId) public view returns(string memory name, string memory dateOfBirth, uint256 zipCode){
+  function getCitizen(uint256 _citizenId) public view returns(string memory name, uint64 dateOfBirth, uint256 zipCode){
     return _getCitizen(_citizenId);
   }
 
