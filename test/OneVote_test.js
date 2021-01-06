@@ -20,15 +20,13 @@ const truffleAssert = require("truffle-assertions");
 
 //creating a citizen test
     describe("creating a citizen", async() => {
-      it.only("should create a new citizen", async() => {
+      it("should create a new citizen", async() => {
         let dob = dateNeeded("May 19, 1986");
 
         const result = await voteInstance.createCitizen("Mark Watson", dob, 91423, 8372738271, {from: user});
         const gottenCitizen = await voteInstance.getCitizen(0, {from: user});
 
         const citizenZipCode = gottenCitizen.zipCode.toString(10);
-        console.log("DOB: ", gottenCitizen.dateOfBirth);
-        console.log("DOB Same: ", dob);
 
         assert.equal(gottenCitizen.name, "Mark Watson");
         assert.equal(gottenCitizen.dateOfBirth, dob);
@@ -98,33 +96,42 @@ const truffleAssert = require("truffle-assertions");
       });
 
 
-      it.only("Should create an office", async() => {
+      it("Should create an office", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
 
-        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        result = await voteInstance.createOffice("Mayor", 91423, ageRequired);
         const office = await voteInstance.getOffice(0);
-
-        const age = office.requiredAge;
-        console.log("Age: ", age);
-        console.log("SameAge: ", ageRequired);
 
         assert.equal(office.officeTitle, "Mayor");
         assert.equal(office.zipCode.toString(10), "91423");
         assert.equal(office.requiredAge, ageRequired);
+        // assert.equal(office.isOpenForElection, true);
+
+        await truffleAssert.eventEmitted(result, 'OfficeAdded', (ev) => {
+          return ev._officeTitle == "Mayor" && ev._zipCode.toString(10) == "91423" && ev._officeId == 0;
+        })
       });
 
-      // it.only("should create a candidate", async() => {
-      //   const ageRequire = dateNeeded("June 3, 1961");
-      //   const startDate = dateNeeded("November 3, 2021");
-      //   const endDate = dateNeeded("November 7, 2021");
-      //
-      //   const officeId = await voteInstance.createOffice("Mayor", 91423, ageRequire, 4);
-      //   const electionId = await voteInstance.createAnElection(officeId, startDate, endDate);
-      //
-      //   const candidateId = await voteInstance.createCandidate(citizenId, 8372738271, officeId, electionId);
-      //
-      //   assert.equals(0, candidateId);
-      // });
+      it("should create a candidate", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        result = await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        const getCandidate = await voteInstance.getCandidate(0);
+
+        assert.equal(getCandidate.name, "Mark Watson");
+        assert.equal(getCandidate.officeTitle, "Mayor");
+        assert.equal(getCandidate.zipCode, 91423);
+        assert.equal(getCandidate.voteCount, 0);
+
+        await truffleAssert.eventEmitted(result, 'CandidateAdded', (ev) => {
+          return ev._name == "Mark Watson" && ev._officeTitle == "Mayor" && ev._electionStart == startDate;
+        });
+      });
 
       // it("should NOT create candidate" async() => {
       //

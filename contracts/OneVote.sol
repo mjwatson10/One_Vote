@@ -44,6 +44,7 @@ contract OneVote{
         string name;
         int64 dateOfBirth;
         string officeTitle;
+        uint256 zipCode;
         uint64 electionStart;
         uint64 electionEnd;
         uint256 voteCount;
@@ -193,13 +194,14 @@ contract OneVote{
 
             require(citizen.stateId == _stateId, "User is not owner of required State ID");
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
-            require(office.requiredAge < citizen.dateOfBirth, "Citizen is NOT old enough to run for Office");
+            require(office.requiredAge >= citizen.dateOfBirth, "Citizen is NOT old enough to run for Office");
 
               //need to find out if it is possible to use _getCitizen() and assign that data to a variable like in javascript
               Candidate memory _candidate = Candidate({
                     name: citizen.name,
                     dateOfBirth: citizen.dateOfBirth,
                     officeTitle: office.officeTitle,
+                    zipCode: office.zipCode,
                     electionStart: election.electionStart,
                     electionEnd: election.electionEnd,
                     voteCount: 0,
@@ -217,6 +219,22 @@ contract OneVote{
 
         return newCandidateId;
       }
+
+
+      function getCandidate(uint256 _candidateId) public view returns(
+            string memory name,
+            string memory officeTitle,
+            uint256 zipCode,
+            uint256 voteCount
+          )
+        {
+          Candidate storage candidate = candidates[_candidateId];
+
+          name = candidate.name;
+          officeTitle = candidate.officeTitle;
+          zipCode = candidate.zipCode;
+          voteCount = candidate.voteCount;
+        }
 
 
       //create an office for candidates to run for election
@@ -252,6 +270,7 @@ contract OneVote{
             string memory officeTitle,
             uint256 zipCode,
             int64 requiredAge
+            /* bool isOpenForElection */
           )
         {
           Office storage office = offices[_officeId];
@@ -260,7 +279,7 @@ contract OneVote{
           zipCode = office.zipCode;
           requiredAge = office.requiredAge;
           /* _termLength = office.termLength; */
-          /* _isOpenForElection = officeIsUpForElection[_officeId]; */
+          /* isOpenForElection = officeIsUpForElection[_officeId]; */
         }
 
 
