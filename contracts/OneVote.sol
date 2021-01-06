@@ -27,6 +27,9 @@ contract OneVote{
     //emitted when a election is created
     event ElectionAdded(string _officeTitle, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _electionId);
 
+    //emitted when new law is created for a vote, does not stat that law is approved
+    event LawAddedForVote(string _lawName, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _lawId);
+
 
 //structs
     //use date object for all dates
@@ -69,7 +72,8 @@ contract OneVote{
     }
 
     struct Law {
-        string law;
+        string lawName;
+        uint256 zipCode;
         uint64 electionStart;
         uint64 electionEnd;
         uint256 voteFor;
@@ -102,6 +106,8 @@ contract OneVote{
     //election mapping
     mapping(uint256 => Election) public electionIdToElection;
     mapping(uint256 => bool) public electionIsActive;
+    //law mapping
+    mapping(uint256 => Law) public lawIdToLaw;
 
 
 
@@ -139,8 +145,8 @@ contract OneVote{
 
             _assignCitizenIdToAddress(address(0), msg.sender, newCitizenId);
 
-            return newCitizenId;
-            }
+          return newCitizenId;
+        }
 
 
       //gets citizen data
@@ -285,9 +291,54 @@ contract OneVote{
 
       //emit event when law is created
       //will need array for zipcodes
-      /* function createALaw(string memory law, uint256 _zipCode) public returns(uint256){
+      function createALaw(
+              string memory _lawName,
+              uint256 _zipCode,
+              uint64 _start,
+              uint64 _end
+          ) public returns(uint256){
 
-      } */
+            Law memory _law = Law({
+                lawName: _lawName,
+                zipCode: _zipCode,
+                electionStart: _start,
+                electionEnd: _end,
+                voteFor: 0,
+                voteAgainst: 0,
+                dateApprovedForVote: uint64(block.timestamp),
+                approvedForVote: true,
+                lawId: laws.length
+              });
+
+          laws.push(_law);
+          uint256 newLawId = laws.length - 1;
+
+          lawIdToLaw[newLawId] = _law;
+
+          emit LawAddedForVote(_lawName, _zipCode, _start, _end, newLawId);
+
+        return newLawId;
+      }
+
+
+      function getLaw(uint256 _lawId) public view returns(
+            string memory lawName,
+            uint256 zipCode,
+            uint64 electionStart,
+            uint64 electionEnd,
+            uint256 voteFor,
+            uint256 voteAgainst
+          )
+        {
+          Law storage law = laws[_lawId];
+
+          lawName = law.lawName;
+          zipCode = law.zipCode;
+          electionStart = law.electionStart;
+          electionEnd = law.electionEnd;
+          voteFor = law.voteFor;
+          voteAgainst = voteAgainst;
+        }
 
 
       //emit event when election is created
@@ -318,5 +369,21 @@ contract OneVote{
 
         return newElectionId;
       }
+
+
+      function getElection(uint256 _electionId) public view returns(
+            string memory officeTitle,
+            uint256 zipCode,
+            uint64 electionStart,
+            uint64 electionEnd
+          )
+        {
+          Election storage election = elections[_electionId];
+
+          officeTitle = election.officeTitle;
+          zipCode = election.zipCode;
+          electionStart = election.electionStart;
+          electionEnd = election.electionEnd;
+        }
 
 }

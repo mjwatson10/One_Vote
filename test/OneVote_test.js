@@ -95,11 +95,10 @@ const truffleAssert = require("truffle-assertions");
         citizenId = await voteInstance.createCitizen("Mark Watson", citizenAge, 91423, 8372738271, {from: user});
       });
 
-
-      it("Should create an office", async() => {
+      it("should create an office", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
 
-        result = await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        const result = await voteInstance.createOffice("Mayor", 91423, ageRequired);
         const office = await voteInstance.getOffice(0);
 
         assert.equal(office.officeTitle, "Mayor");
@@ -111,6 +110,29 @@ const truffleAssert = require("truffle-assertions");
           return ev._officeTitle == "Mayor" && ev._zipCode.toString(10) == "91423" && ev._officeId == 0;
         })
       });
+
+      it("should create an election", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        const result = await voteInstance.createAnElection(0, startDate, endDate);
+        const election = await voteInstance.getElection(0);
+
+        assert.equal(election.officeTitle, "Mayor");
+        assert.equal(election.zipCode, 91423);
+        assert.equal(election.electionStart, startDate);
+        assert.equal(election.electionEnd, endDate);
+
+        await truffleAssert.eventEmitted(result, 'ElectionAdded', (ev) => {
+          return ev._officeTitle == "Mayor" && ev._zipCode == 91423 && ev._electionStart == startDate && ev._electionEnd == endDate && ev._electionId == 0;
+        });
+      });
+
+      // it.only("should NOT create an election", async() => {
+      //
+      // });
 
       it("should create a candidate", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
@@ -133,7 +155,7 @@ const truffleAssert = require("truffle-assertions");
         });
       });
 
-      // it("should NOT create candidate" async() => {
+      // it.only("should NOT create candidate" async() => {
       //
       // });
     });
