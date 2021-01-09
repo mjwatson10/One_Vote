@@ -155,7 +155,7 @@ const truffleAssert = require("truffle-assertions");
         });
       });
 
-      it.only("should NOT create candidate" async() => {
+      it("should NOT create candidate" async() => {
 
       });
     });
