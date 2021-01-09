@@ -1,7 +1,8 @@
 pragma solidity ^0.6.6;
 
-import "./Safemath.sol";
-//import "../node_modules/@openzeppelin/contracts/access/AssceccControl.sol";
+import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/math/SignedSafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
 //see if can use TimedCrowdsale.sol for election time and TimelockController
 
 
@@ -9,6 +10,7 @@ import "./Safemath.sol";
 contract OneVote{
 
     using SafeMath for uint256;
+    using SignedSafeMath for int256;
 
 
 //events
@@ -23,6 +25,9 @@ contract OneVote{
 
     //emitted when an office is create
     event OfficeAdded(string _officeTitle, uint256 _zipCode, uint256 _officeId);
+
+    //emitted when office position is filled and no longer open until next office position is created
+    event OfficePositionIsFilledBy(string _officeTitle, string _name, uint256 zipCode);
 
     //emitted when a election is created
     event ElectionAdded(string _officeTitle, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _electionId);
@@ -39,17 +44,21 @@ contract OneVote{
         int64 dateOfBirth;
         uint256 zipCode;
         uint64 dateApproved;
+        //bool used for whether a citizen has died or lost citizenship
         bool citizenship;
         uint256 citizenId;
     }
 
     struct Candidate {
-        string name;
+        uint256 citizenId;
+        uint256 officeId;
+        uint256 electionId;
+        /* string name;
         int64 dateOfBirth;
         string officeTitle;
         uint256 zipCode;
         uint64 electionStart;
-        uint64 electionEnd;
+        uint64 electionEnd; */
         uint256 voteCount;
         uint64 dateApprovedToRun;
         uint256 candidateId;
@@ -64,8 +73,9 @@ contract OneVote{
     }
 
     struct Election {
-        string officeTitle;
-        uint256 zipCode;
+        /* string officeTitle;
+        uint256 zipCode; */
+        uint256 officeId;
         uint64 electionStart;
         uint64 electionEnd;
         uint256 electionId;
@@ -98,16 +108,16 @@ contract OneVote{
     mapping(uint256 => bool) private stateIdInUse;
     mapping(address => bool) private addressInUse;
     //candidate mapping
-    mapping(uint256 => Candidate) public candidateIdToCandidate;
+    /* mapping(uint256 => Candidate) public candidateIdToCandidate; */
     mapping(uint256 => bool) public candidateIsApprovedToRun;
     //office mapping
-    mapping(uint256 => Office) public officeIdToOffice;
+    /* mapping(uint256 => Office) public officeIdToOffice; */
     mapping(uint256 => bool) public officeIsUpForElection;
     //election mapping
-    mapping(uint256 => Election) public electionIdToElection;
+    /* mapping(uint256 => Election) public electionIdToElection; */
     mapping(uint256 => bool) public electionIsActive;
     //law mapping
-    mapping(uint256 => Law) public lawIdToLaw;
+    /* mapping(uint256 => Law) public lawIdToLaw; */
 
 
 
@@ -195,8 +205,8 @@ contract OneVote{
             require(citizenIndexToOwner[_citizenId] == msg.sender, "User is not owner of citizen trying to become candidate");
 
             Citizen memory citizen = citizenIdToCitizen[_citizenId];
-            Office memory office = officeIdToOffice[_officeId];
-            Election memory election = electionIdToElection[_electionId];
+            Office memory office = offices[_officeId];
+            Election memory election = elections[_electionId];
 
             require(citizen.stateId == _stateId, "User is not owner of required State ID");
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
@@ -204,12 +214,15 @@ contract OneVote{
 
               //need to find out if it is possible to use _getCitizen() and assign that data to a variable like in javascript
               Candidate memory _candidate = Candidate({
-                    name: citizen.name,
-                    dateOfBirth: citizen.dateOfBirth,
-                    officeTitle: office.officeTitle,
-                    zipCode: office.zipCode,
-                    electionStart: election.electionStart,
-                    electionEnd: election.electionEnd,
+                    /* //name: citizen.name,
+                    //dateOfBirth: citizen.dateOfBirth,
+                    //officeTitle: office.officeTitle,
+                    //zipCode: office.zipCode, */
+                    citizenId: _citizenId,
+                    officeId: _officeId,
+                    /* electionStart: election.electionStart,
+                    electionEnd: election.electionEnd, */
+                    electionId: _electionId,
                     voteCount: 0,
                     dateApprovedToRun: uint64(block.timestamp),
                     candidateId: candidates.length
@@ -218,7 +231,7 @@ contract OneVote{
             candidates.push(_candidate);
             uint256 newCandidateId = candidates.length - 1;
 
-            candidateIdToCandidate[newCandidateId] = _candidate;
+            /* candidateIdToCandidate[newCandidateId] = _candidate; */
             candidateIsApprovedToRun[newCandidateId] = true;
 
             emit CandidateAdded(citizen.name, office.officeTitle, election.electionStart);
@@ -235,10 +248,12 @@ contract OneVote{
           )
         {
           Candidate storage candidate = candidates[_candidateId];
+          Office memory office = offices[candidate.officeId];
+          Citizen memory citizen = citizens[candidate.citizenId];
 
-          name = candidate.name;
-          officeTitle = candidate.officeTitle;
-          zipCode = candidate.zipCode;
+          name = citizen.name;
+          officeTitle = office.officeTitle;
+          zipCode = office.zipCode;
           voteCount = candidate.voteCount;
         }
 
@@ -263,7 +278,7 @@ contract OneVote{
               offices.push(_office);
               uint256 newOfficeId = offices.length - 1;
 
-              officeIdToOffice[newOfficeId] = _office;
+              /* officeIdToOffice[newOfficeId] = _office; */
               officeIsUpForElection[newOfficeId] = true;
 
               emit OfficeAdded(_officeTitle, _zipCode, newOfficeId);
@@ -275,8 +290,8 @@ contract OneVote{
       function getOffice(uint256 _officeId) public view returns(
             string memory officeTitle,
             uint256 zipCode,
-            int64 requiredAge
-            /* bool isOpenForElection */
+            int64 requiredAge,
+            bool isOpenForElection
           )
         {
           Office storage office = offices[_officeId];
@@ -284,9 +299,25 @@ contract OneVote{
           officeTitle = office.officeTitle;
           zipCode = office.zipCode;
           requiredAge = office.requiredAge;
-          /* _termLength = office.termLength; */
-          /* isOpenForElection = officeIsUpForElection[_officeId]; */
+          isOpenForElection = officeIsUpForElection[_officeId];
         }
+
+
+      //changes status of open offices after elections
+      function filledOfficePosition(uint256 _officeId, uint256 _candidateId) internal {
+        require(officeIsUpForElection[_officeId] == true);
+
+        Candidate memory candidate = candidates[_candidateId];
+        Office memory candidateOffice = offices[candidate.officeId];
+        Office memory office = offices[_officeId];
+        Citizen memory citizen = citizens[candidate.citizenId];
+
+        require(office.zipCode == candidateOffice.zipCode);
+
+        officeIsUpForElection[_officeId] = false;
+
+        emit OfficePositionIsFilledBy(office.officeTitle, citizen.name, office.zipCode);
+      }
 
 
       //emit event when law is created
@@ -313,7 +344,7 @@ contract OneVote{
           laws.push(_law);
           uint256 newLawId = laws.length - 1;
 
-          lawIdToLaw[newLawId] = _law;
+          /* lawIdToLaw[newLawId] = _law; */
 
           emit LawAddedForVote(_lawName, _zipCode, _start, _end, newLawId);
 
@@ -350,11 +381,12 @@ contract OneVote{
           ) public returns(uint256){
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
 
-            Office memory office = officeIdToOffice[_officeId];
+            Office memory office = offices[_officeId];
 
             Election memory _election = Election({
-                officeTitle: office.officeTitle,
-                zipCode: office.zipCode,
+                /* officeTitle: office.officeTitle,
+                zipCode: office.zipCode, */
+                officeId: _officeId,
                 electionStart: _start,
                 electionEnd: _end,
                 electionId: elections.length
@@ -363,7 +395,7 @@ contract OneVote{
             elections.push(_election);
             uint256 newElectionId = elections.length - 1;
 
-            electionIdToElection[newElectionId] = _election;
+            /* electionIdToElection[newElectionId] = _election; */
 
             emit ElectionAdded(office.officeTitle, office.zipCode, _start, _end, newElectionId);
 
@@ -379,9 +411,10 @@ contract OneVote{
           )
         {
           Election storage election = elections[_electionId];
+          Office memory office = offices[election.officeId];
 
-          officeTitle = election.officeTitle;
-          zipCode = election.zipCode;
+          officeTitle = office.officeTitle;
+          zipCode = office.zipCode;
           electionStart = election.electionStart;
           electionEnd = election.electionEnd;
         }
