@@ -23,4 +23,19 @@ contract Test is OneVote {
   function addressAssignedToId(uint256 _tokenId) public view returns(address){
     return citizenIndexToOwner[_tokenId];
   }
+
+
+  function loseOfCitizenship(
+          uint256 _citizenId,
+          address _citizenAddress,
+          string memory _reasonForLoseOfCitizenship
+    ) public{
+      _loseOfCitizenship(_citizenId, _citizenAddress, _reasonForLoseOfCitizenship);
+  }
+
+
+  function filledOfficePosition(uint256 _officeId, uint256 _candidateId) public {
+    _filledOfficePosition(_officeId, _candidateId);
+  }
+
 }

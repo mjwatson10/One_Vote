@@ -7,15 +7,18 @@ import "../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
 
 
 
-contract OneVote{
+contract OneVote is AccessControl{
 
     using SafeMath for uint256;
     using SignedSafeMath for int256;
 
 
-//events
+//EVENTS
     //emitted when citizen is created showing new citizen's name, indexed citizen's address zip code, date approved
     event CitizenAdded(address owner, uint256 citizenId, uint256 stateId, uint256 zipCode);
+
+    //emitted when citizen has died or citzenship has been dismissed or revoked
+    event NoLongerACitizen(uint256 citizenId, address citzenAddress, string reasonForLoseOfCitizenship);
 
     //emitted when citizen is assigned to a corresponding address
     event Assigned(address from, address to, uint256 tokenId);
@@ -35,8 +38,10 @@ contract OneVote{
     //emitted when new law is created for a vote, does not stat that law is approved
     event LawAddedForVote(string _lawName, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _lawId);
 
+    //emitted when vote has been cast
+    event VoteCast(uint256 _candidateid, uint256 _electionId, uint256 timeVoteCast, string voteCast);
 
-//structs
+//STRUCTS
     //use date object for all dates
     struct Citizen {
         uint256 stateId;
@@ -79,6 +84,7 @@ contract OneVote{
         uint64 electionStart;
         uint64 electionEnd;
         uint256 electionId;
+        uint256[] candidateIds;
     }
 
     struct Law {
@@ -93,8 +99,13 @@ contract OneVote{
         uint256 lawId;
     }
 
+    /* struct Running{
+      uint256 electionId;
+      uint256[] candidateIds;
+    } */
 
-//arrays
+
+//ARRAYS
     Citizen[] citizens;
     Candidate[] candidates;
     Office[] offices;
@@ -107,24 +118,40 @@ contract OneVote{
     mapping(uint256 => Citizen) public citizenIdToCitizen;
     mapping(uint256 => bool) private stateIdInUse;
     mapping(address => bool) private addressInUse;
+
     //candidate mapping
     /* mapping(uint256 => Candidate) public candidateIdToCandidate; */
     mapping(uint256 => bool) public candidateIsApprovedToRun;
+
     //office mapping
     /* mapping(uint256 => Office) public officeIdToOffice; */
     mapping(uint256 => bool) public officeIsUpForElection;
+
     //election mapping
     /* mapping(uint256 => Election) public electionIdToElection; */
     mapping(uint256 => bool) public electionIsActive;
+
     //law mapping
     /* mapping(uint256 => Law) public lawIdToLaw; */
 
+    //results mapping of a particular election id
+    /* mapping(uint256 => Running) public runningForElectionId; */
 
 
-//function
-    //creates citizens that will be able to vote if citizens are included in a particular election
-    //emits event once citizen is created
-    //a citizen cannot have the same stateId as another citizen
+//CONSTRUCTOR
+    /*    // will set access control as contract owner upon deploying contract */
+    constructor() public {
+      _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+
+
+//FUNCTIONS
+////creation functions
+
+    /*  //creates citizens that will be able to vote if citizens are included in a particular election
+        //emits event once citizen is created
+        //a citizen cannot have the same stateId as another citizen */
     function _createCitizen(
             string memory _name,
             int64 _dateOfBirth,
@@ -159,8 +186,8 @@ contract OneVote{
         }
 
 
-      //gets citizen data
-      //must be internal to prevent data being seen by unwanted users
+      /*  //gets citizen data
+          //must be internal to prevent data being seen by unwanted users */
       function _getCitizen(uint256 _citizenId)internal view returns(
             string memory _name,
             int64 _dateOfBirth,
@@ -182,7 +209,7 @@ contract OneVote{
       }
 
 
-      //transfer citizen data to address the citizen was created to represent
+      /* //transfer citizen data to address the citizen was created to represent */
       function _assignCitizenIdToAddress(address _from, address _to, uint256 _tokenId) internal {
         citizenIndexToOwner[_tokenId] = _to;
         citizenIdOfAddress[_to] = _tokenId;
@@ -191,9 +218,24 @@ contract OneVote{
       }
 
 
-      //create a candidate that will be used for elections
-      //all candidates must be citizens
-      //emit event when canidiate is created
+      /* //used when citizens have died or citzenship has been dismissed or revoked */
+      function _loseOfCitizenship(
+              uint256 _citizenId,
+              address _citizenAddress,
+              string memory _reason
+          ) internal {
+            require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to changing citizenship status");
+            require(citizenIndexToOwner[_citizenId] == _citizenAddress, "This is not the citizens correct address");
+            require(msg.sender != _citizenAddress, "You cannot change your own citizenship");
+
+            stateIdInUse[_citizenId] = false;
+            addressInUse[_citizenAddress] = false;
+          }
+
+
+      /*  //create a candidate that will be used for elections
+          //all candidates must be citizens
+          //emit event when canidiate is created */
       function createCandidate(
               uint256 _citizenId,
               uint256 _stateId,
@@ -208,6 +250,7 @@ contract OneVote{
             Office memory office = offices[_officeId];
             Election memory election = elections[_electionId];
 
+            require(citizen.citizenship == true, "You are no longer a citizen");
             require(citizen.stateId == _stateId, "User is not owner of required State ID");
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
             require(office.requiredAge >= citizen.dateOfBirth, "Citizen is NOT old enough to run for Office");
@@ -230,7 +273,9 @@ contract OneVote{
 
             candidates.push(_candidate);
             uint256 newCandidateId = candidates.length - 1;
+            elections[_electionId].candidateIds.push(newCandidateId);
 
+            /* elections[_electionId].candidateIds.push(newCandidateId); */
             /* candidateIdToCandidate[newCandidateId] = _candidate; */
             candidateIsApprovedToRun[newCandidateId] = true;
 
@@ -258,9 +303,18 @@ contract OneVote{
         }
 
 
-      //create an office for candidates to run for election
-      //emit event when office is created
-      //will need array for zipcode if office covers multiple zipcodes
+      /*  //will set mapping runningForElectionId to electionId
+          //push candidateIds into the array contained in the struct Running associated with the assigned electionId's mapping   */
+      /* function _setRunningCandiatesOfElectionId(uint256 _electionId, uint256 _candidateId) internal {
+        require(electionIsActive[_electionId] == true, "Election is not active");
+
+        Running memory
+      } */
+
+
+      /*  //create an office for candidates to run for election
+          //emit event when office is created
+          //will need array for zipcode if office covers multiple zipcodes */
       function createOffice(
               string memory _officeTitle,
               uint256 _zipCode,
@@ -303,8 +357,8 @@ contract OneVote{
         }
 
 
-      //changes status of open offices after elections
-      function filledOfficePosition(uint256 _officeId, uint256 _candidateId) internal {
+      /* //changes status of open offices after elections */
+      function _filledOfficePosition(uint256 _officeId, uint256 _candidateId) internal {
         require(officeIsUpForElection[_officeId] == true);
 
         Candidate memory candidate = candidates[_candidateId];
@@ -320,8 +374,8 @@ contract OneVote{
       }
 
 
-      //emit event when law is created
-      //will need array for zipcodes
+      /*  //emit event when law is created
+          //will need array for zipcodes */
       function createALaw(
               string memory _lawName,
               uint256 _zipCode,
@@ -372,27 +426,30 @@ contract OneVote{
         }
 
 
-      //emit event when election is created
-      //will need to access office array in which election is forum
+      /*  //emit event when election is created
+          //will need to access office array in which election is forum */
       function createAnElection(
               uint256 _officeId,
               uint64 _start,
               uint64 _end
           ) public returns(uint256){
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
+            require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to creating an election");
+
+            elections.push();
 
             Office memory office = offices[_officeId];
 
-            Election memory _election = Election({
+            Election storage election = elections[elections.length - 1];
                 /* officeTitle: office.officeTitle,
                 zipCode: office.zipCode, */
-                officeId: _officeId,
-                electionStart: _start,
-                electionEnd: _end,
-                electionId: elections.length
-            });
+                election.officeId = _officeId;
+                election.electionStart = _start;
+                election.electionEnd = _end;
+                election.electionId = elections.length;
 
-            elections.push(_election);
+
+            /* elections.push(_election); */
             uint256 newElectionId = elections.length - 1;
 
             /* electionIdToElection[newElectionId] = _election; */
@@ -419,4 +476,29 @@ contract OneVote{
           electionEnd = election.electionEnd;
         }
 
+
+////voting function
+      function vote(uint256 _citizenId, uint256 voteForCandidateId, uint256 _electionId) public {
+        require(citizenIndexToOwner[_citizenId] == msg.sender, "User is not owner of citizen trying to vote");
+        require(addressInUse[msg.sender] == true, "This address is not eligible to vote");
+
+        Citizen memory citizen = citizenIdToCitizen[_citizenId];
+        require(citizen.citizenship == true, "You are no longer a citizen");
+
+        Election memory election = elections[_electionId];
+        require(election.electionStart >= uint64(block.timestamp), "The election has not opened yet");
+        require(election.electionEnd <= uint64(block.timestamp), "The election is no longer open");
+
+        Office memory office = offices[election.officeId];
+        require(citizen.zipCode == office.zipCode, "You are not permitted to vote for this office in this zipcode");
+
+        Candidate memory candidate = candidates[voteForCandidateId];
+        require(candidate.officeId == election.officeId && candidate.electionId == _electionId, "This candidate is not eligible for this vote");
+        candidate.voteCount++;
+
+        emit VoteCast(voteForCandidateId, _electionId, uint64(block.timestamp), "Congratulations, you have cast your vote");
+      }
+
+
+      /* function getResultsOfElection(uint256 _electionId) */
 }

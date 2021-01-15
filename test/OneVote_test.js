@@ -18,6 +18,17 @@ const truffleAssert = require("truffle-assertions");
       });
 
 
+//init test
+      it("should assign 'DEFAULT_ADMIN_ROLE' to the accounts[0] address", async() => {
+        const role = await voteInstance.DEFAULT_ADMIN_ROLE({from:accounts[0]});
+        const admin = await voteInstance.hasRole(role, accounts[0], {from: accounts[0]});
+
+        console.log("Admin: ", admin);
+
+        assert.equal(admin, true);
+      });
+
+
 //creating a citizen test
     describe("creating a citizen", async() => {
       it("should create a new citizen", async() => {
@@ -130,9 +141,28 @@ const truffleAssert = require("truffle-assertions");
         });
       });
 
-      // it.only("should NOT create an election", async() => {
-      //
-      // });
+      it("should NOT create an election because office is NOT open for an election", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        await voteInstance.filledOfficePosition(0, 0);
+
+        await truffleAssert.fails(voteInstance.createAnElection(0, startDate, endDate));
+      });
+
+      it("should NOT create an election because address does not have 'Administrator' access", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+
+        await truffleAssert.fails(voteInstance.createAnElection(0, startDate, endDate, {from:user}));
+      });
 
       it("should create a candidate", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
@@ -155,9 +185,83 @@ const truffleAssert = require("truffle-assertions");
         });
       });
 
-      it("should NOT create candidate" async() => {
+      it("should NOT create candidate because candidate does not have state ID", async() => {
+        const newCitizenAge = dateNeeded("July 20, 1949");
 
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await truffleAssert.fails(voteInstance.createCandidate(1, 9000000000, 0, 0, {from: accounts[2]}));
       });
+
+      it("should NOT create candidate because candidate is using an address that has NOT been assigned to state ID", async() => {
+        const newCitizenAge = dateNeeded("July 20, 1949");
+
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[3]}));
+      });
+
+      it("should NOT create candidate because candidate is using an address that has been assigned to another state ID", async() => {
+        const newCitizenAge = dateNeeded("July 20, 1949");
+
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[user]}));
+      });
+
+      it("should NOT create candidate because office running for is NOT open for election", async() => {
+        const newCitizenAge = dateNeeded("July 20, 1949");
+
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        await voteInstance.filledOfficePosition(0, 0);
+
+        await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[2]}));
+      });
+
+      it("should NOT create candidate because candidate's is NOT old enough to run for that particular office", async() => {
+        const newCitizenAge = dateNeeded("July 20, 1962");
+
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[2]}));
+      });
+
     });
 
 
