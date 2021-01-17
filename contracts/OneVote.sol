@@ -99,11 +99,6 @@ contract OneVote is AccessControl{
         uint256 lawId;
     }
 
-    /* struct Running{
-      uint256 electionId;
-      uint256[] candidateIds;
-    } */
-
 
 //ARRAYS
     Citizen[] citizens;
@@ -113,6 +108,7 @@ contract OneVote is AccessControl{
     Law[] laws;
 
     //citizen mapping
+    /// @dev citizen mapping needs to be private after testing
     mapping(uint256 => address) public citizenIndexToOwner;
     mapping(address => uint256) public citizenIdOfAddress;
     mapping(uint256 => Citizen) public citizenIdToCitizen;
@@ -129,13 +125,10 @@ contract OneVote is AccessControl{
 
     //election mapping
     /* mapping(uint256 => Election) public electionIdToElection; */
-    mapping(uint256 => bool) public electionIsActive;
+    /* mapping(uint256 => bool) public electionIsActive; */
 
     //law mapping
     /* mapping(uint256 => Law) public lawIdToLaw; */
-
-    //results mapping of a particular election id
-    /* mapping(uint256 => Running) public runningForElectionId; */
 
 
 //CONSTRUCTOR
@@ -303,18 +296,9 @@ contract OneVote is AccessControl{
         }
 
 
-      /*  //will set mapping runningForElectionId to electionId
-          //push candidateIds into the array contained in the struct Running associated with the assigned electionId's mapping   */
-      /* function _setRunningCandiatesOfElectionId(uint256 _electionId, uint256 _candidateId) internal {
-        require(electionIsActive[_electionId] == true, "Election is not active");
-
-        Running memory
-      } */
-
-
       /*  //create an office for candidates to run for election
           //emit event when office is created
-          //will need array for zipcode if office covers multiple zipcodes */
+          //will need array for zipCode if office covers multiple zipCodes */
       function createOffice(
               string memory _officeTitle,
               uint256 _zipCode,
@@ -375,7 +359,7 @@ contract OneVote is AccessControl{
 
 
       /*  //emit event when law is created
-          //will need array for zipcodes */
+          //will need array for zipCodes */
       function createALaw(
               string memory _lawName,
               uint256 _zipCode,
@@ -486,11 +470,11 @@ contract OneVote is AccessControl{
         require(citizen.citizenship == true, "You are no longer a citizen");
 
         Election memory election = elections[_electionId];
-        require(election.electionStart >= uint64(block.timestamp), "The election has not opened yet");
-        require(election.electionEnd <= uint64(block.timestamp), "The election is no longer open");
+        require(election.electionStart <= uint64(block.timestamp), "The election has not opened yet");
+        require(election.electionEnd >= uint64(block.timestamp), "The election is no longer open");
 
         Office memory office = offices[election.officeId];
-        require(citizen.zipCode == office.zipCode, "You are not permitted to vote for this office in this zipcode");
+        require(citizen.zipCode == office.zipCode, "You are not permitted to vote for this office in this zipCode");
 
         Candidate memory candidate = candidates[voteForCandidateId];
         require(candidate.officeId == election.officeId && candidate.electionId == _electionId, "This candidate is not eligible for this vote");
@@ -500,5 +484,34 @@ contract OneVote is AccessControl{
       }
 
 
-      /* function getResultsOfElection(uint256 _electionId) */
+      //returns individual candidates election data based on candidateId for only after vote casting has concluded
+      function getResultsOfCandidate(uint256 _candidateId) public view returns(
+            string memory _officeTitle,
+            uint256 _zipCode,
+            string memory _candidateName,
+            uint256 _voteCount
+          )
+      {
+        Candidate storage candidate = candidates[_candidateId];
+
+        Citizen storage citizen = citizens[candidate.citizenId];
+
+        Election storage election = elections[candidate.electionId];
+        require(election.electionEnd <= uint64(block.timestamp), "Election results are not available until election is close off from voting");
+
+        Office storage office = offices[election.officeId];
+
+        _officeTitle = office.officeTitle;
+        _zipCode = office.zipCode;
+        _candidateName = citizen.name;
+        _voteCount = candidate.voteCount;
+      }
+
+
+      //returns all candidateIds contained in an election struct based on an electionId
+      function getAllCandidateIds(uint256 _electionId) public view returns (uint256[] memory){
+        Election memory election = elections[_electionId];
+
+        return election.candidateIds;
+      }
 }
