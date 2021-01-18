@@ -230,7 +230,7 @@ const truffleAssert = require("truffle-assertions");
         await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[user]}));
       });
 
-      it("should NOT create candidate because office running for is NOT open for election", async() => {
+      it("should NOT create candidate because office running for office is NOT open for election", async() => {
         const newCitizenAge = dateNeeded("July 20, 1949");
 
         await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
@@ -260,6 +260,61 @@ const truffleAssert = require("truffle-assertions");
         await voteInstance.createAnElection(0, startDate, endDate);
 
         await truffleAssert.fails(voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[2]}));
+      });
+
+    });
+
+
+//test for election data
+    describe("Elections", async() => {
+      let citizenAge;
+      let citizenId;
+
+      beforeEach(async() => {
+        citizenAge = dateNeeded("July 20, 1949");
+
+        citizenId = await voteInstance.createCitizen("Mark Watson", citizenAge, 91423, 8372738271, {from: user});
+      });
+
+      it("should get all candidateIds in an election", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("November 3, 2021");
+        const endDate = dateNeeded("November 7, 2021");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        await voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[2]});
+
+        const candidateIds = await voteInstance.getAllCandidateIds(0);
+
+        assert.equal(candidateIds[0], 0);
+        assert.equal(candidateIds[1], 1);
+        assert.equal(candidateIds.length, 2);
+      });
+
+      it.only("should allow citizen to cast a vote for a candidate", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        console.log("Start: ", startDate);
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+        const getElection = await voteInstance.getElection(0);
+        console.log("Start: ", getElection.electionStart.toString(10));
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        // await truffleAssert.passes(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
       });
 
     });
