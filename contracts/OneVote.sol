@@ -462,6 +462,7 @@ contract OneVote is AccessControl{
 
 
 ////voting function
+
       function vote(uint256 _citizenId, uint256 voteForCandidateId, uint256 _electionId) public {
         require(citizenIndexToOwner[_citizenId] == msg.sender, "User is not owner of citizen trying to vote");
         require(addressInUse[msg.sender] == true, "This address is not eligible to vote");
@@ -476,15 +477,15 @@ contract OneVote is AccessControl{
         Office memory office = offices[election.officeId];
         require(citizen.zipCode == office.zipCode, "You are not permitted to vote for this office in this zipCode");
 
-        Candidate memory candidate = candidates[voteForCandidateId];
+        Candidate storage candidate = candidates[voteForCandidateId];
         require(candidate.officeId == election.officeId && candidate.electionId == _electionId, "This candidate is not eligible for this vote");
-        candidate.voteCount++;
+        candidate.voteCount = candidate.voteCount++;
 
         emit VoteCast(voteForCandidateId, _electionId, uint64(block.timestamp), "Congratulations, you have cast your vote");
       }
 
 
-      //returns individual candidates election data based on candidateId for only after vote casting has concluded
+      /*  //returns individual candidates election data based on candidateId for only after vote casting has concluded */
       function getResultsOfCandidate(uint256 _candidateId) public view returns(
             string memory _officeTitle,
             uint256 _zipCode,
@@ -508,10 +509,19 @@ contract OneVote is AccessControl{
       }
 
 
-      //returns all candidateIds contained in an election struct based on an electionId
+      /*  //returns all candidateIds contained in an election struct based on an electionId */
       function getAllCandidateIds(uint256 _electionId) public view returns (uint256[] memory){
         Election memory election = elections[_electionId];
 
         return election.candidateIds;
       }
+
+
+      /*  //returns winner of each election associated with a particular electionId
+          //(full elections may be made of multiple electionIds due to election covering multiple zipCodes)
+          //will change officeIsUpForElection to false
+          //(this will only change the officeId associated with the particular electionId other officeIds of the same office may remain open until a later date due to office covering multiple zipCodes) */
+      /* function getWinnerOfElectionId(uint256 _electionId) public returns(uint256 _candidateId){
+
+      } */
 }

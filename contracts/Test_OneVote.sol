@@ -38,4 +38,32 @@ contract Test is OneVote {
     _filledOfficePosition(_officeId, _candidateId);
   }
 
+
+  function timestamp() public view returns(uint64){
+    return uint64(block.timestamp);
+  }
+
+
+  function getTestResultsOfCandidate(uint256 _candidateId) public view returns(
+        string memory _officeTitle,
+        uint256 _zipCode,
+        string memory _candidateName,
+        uint256 _voteCount
+      )
+  {
+    Candidate storage candidate = candidates[_candidateId];
+
+    Citizen storage citizen = citizens[candidate.citizenId];
+
+    Election storage election = elections[candidate.electionId];
+    /* require(election.electionEnd <= uint64(block.timestamp), "Election results are not available until election is close off from voting"); */
+
+    Office storage office = offices[election.officeId];
+
+    _officeTitle = office.officeTitle;
+    _zipCode = office.zipCode;
+    _candidateName = citizen.name;
+    _voteCount = candidate.voteCount;
+  }
+
 }

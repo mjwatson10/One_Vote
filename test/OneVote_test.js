@@ -1,6 +1,7 @@
 //const OneVoteContract = artifacts.require("OneVote");
 const ProxyVote = artifacts.require("Test")
 const truffleAssert = require("truffle-assertions");
+const moment = require("moment");
 
 
     contract ("OneVote", async(accounts) => {
@@ -8,7 +9,7 @@ const truffleAssert = require("truffle-assertions");
       const user = accounts[1];
 
       const dateNeeded = (date) => {
-        let ageInMilliseconds = Date.parse(date);
+        let ageInMilliseconds = Date.parse(date) / 1000;
 
         return ageInMilliseconds;
       }
@@ -297,24 +298,71 @@ const truffleAssert = require("truffle-assertions");
         assert.equal(candidateIds.length, 2);
       });
 
-      it.only("should allow citizen to cast a vote for a candidate", async() => {
+      it("should allow citizen to cast a vote for a candidate", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
         const startDate = dateNeeded("January 1, 2021");
         const endDate = dateNeeded("November 7, 2131");
-
-        console.log("Start: ", startDate);
 
         const newCitizenAge = dateNeeded("July 20, 1949");
         await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
 
         await voteInstance.createOffice("Mayor", 91423, ageRequired);
         await voteInstance.createAnElection(0, startDate, endDate);
-        const getElection = await voteInstance.getElection(0);
-        console.log("Start: ", getElection.electionStart.toString(10));
 
         await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
 
-        // await truffleAssert.passes(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        await truffleAssert.passes(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+      });
+
+      it("should allow a candidate to vote for themselves", async() =>{
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.passes(voteInstance.vote(0, 0, 0, {from: user}));
+      });
+
+      it("should allow a candidate to cast a vote for another candidate", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        await voteInstance.createCandidate(1, 7201936274, 0, 0, {from: accounts[2]});
+
+        await truffleAssert.passes(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+      });
+
+      it.only("should get the total number of votes cast for a candidate", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await voteInstance.vote(1, 0, 0, {from: accounts[2]});
+        await voteInstance.vote(0, 0, 0, {from: user});
+        const candidate = await voteInstance.getTestResultsOfCandidate(0);
+        console.log("Candidate: ", candidate);
+
+        assert.equal(candidate._voteCount.toString(10), 1);
       });
 
     });
