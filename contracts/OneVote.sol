@@ -39,7 +39,7 @@ contract OneVote is AccessControl{
     event LawAddedForVote(string _lawName, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _lawId);
 
     //emitted when vote has been cast
-    event VoteCast(uint256 _candidateid, uint256 _electionId, uint256 timeVoteCast, string voteCast);
+    event VoteCast(uint256 _candidateId, uint256 _electionId, uint256 timeVoteCast);
 
 //STRUCTS
     //use date object for all dates
@@ -479,9 +479,9 @@ contract OneVote is AccessControl{
 
         Candidate storage candidate = candidates[voteForCandidateId];
         require(candidate.officeId == election.officeId && candidate.electionId == _electionId, "This candidate is not eligible for this vote");
-        candidate.voteCount = candidate.voteCount++;
+        candidate.voteCount += 1;
 
-        emit VoteCast(voteForCandidateId, _electionId, uint64(block.timestamp), "Congratulations, you have cast your vote");
+        emit VoteCast(voteForCandidateId, _electionId, uint64(block.timestamp));
       }
 
 

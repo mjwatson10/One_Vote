@@ -24,8 +24,6 @@ const moment = require("moment");
         const role = await voteInstance.DEFAULT_ADMIN_ROLE({from:accounts[0]});
         const admin = await voteInstance.hasRole(role, accounts[0], {from: accounts[0]});
 
-        console.log("Admin: ", admin);
-
         assert.equal(admin, true);
       });
 
@@ -45,7 +43,10 @@ const moment = require("moment");
         assert.equal(gottenCitizen.zipCode.toString(10), "91423");
 
         await truffleAssert.eventEmitted(result, 'CitizenAdded', (ev) => {
-          return ev.owner == user && ev.citizenId == 0 && ev.stateId == 8372738271 && ev.zipCode == parseInt(citizenZipCode);
+          return  ev.owner == user &&
+                  ev.citizenId == 0 &&
+                  ev.stateId == 8372738271 &&
+                  ev.zipCode == parseInt(citizenZipCode);
         });
       });
 
@@ -119,7 +120,9 @@ const moment = require("moment");
         // assert.equal(office.isOpenForElection, true);
 
         await truffleAssert.eventEmitted(result, 'OfficeAdded', (ev) => {
-          return ev._officeTitle == "Mayor" && ev._zipCode.toString(10) == "91423" && ev._officeId == 0;
+          return  ev._officeTitle == "Mayor" &&
+                  ev._zipCode.toString(10) == "91423" &&
+                  ev._officeId == 0;
         })
       });
 
@@ -138,7 +141,11 @@ const moment = require("moment");
         assert.equal(election.electionEnd, endDate);
 
         await truffleAssert.eventEmitted(result, 'ElectionAdded', (ev) => {
-          return ev._officeTitle == "Mayor" && ev._zipCode == 91423 && ev._electionStart == startDate && ev._electionEnd == endDate && ev._electionId == 0;
+          return  ev._officeTitle == "Mayor" &&
+                  ev._zipCode == 91423 &&
+                  ev._electionStart == startDate &&
+                  ev._electionEnd == endDate &&
+                  ev._electionId == 0;
         });
       });
 
@@ -182,7 +189,9 @@ const moment = require("moment");
         assert.equal(getCandidate.voteCount, 0);
 
         await truffleAssert.eventEmitted(result, 'CandidateAdded', (ev) => {
-          return ev._name == "Mark Watson" && ev._officeTitle == "Mayor" && ev._electionStart == startDate;
+          return  ev._name == "Mark Watson" &&
+                  ev._officeTitle == "Mayor" &&
+                  ev._electionStart == startDate;
         });
       });
 
@@ -348,6 +357,7 @@ const moment = require("moment");
         const ageRequired = dateNeeded("June 3, 1961");
         const startDate = dateNeeded("January 1, 2021");
         const endDate = dateNeeded("November 7, 2131");
+        const timestamp = await voteInstance.timestamp();
 
         const newCitizenAge = dateNeeded("July 20, 1949");
         await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
@@ -357,12 +367,16 @@ const moment = require("moment");
 
         await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
 
-        await voteInstance.vote(1, 0, 0, {from: accounts[2]});
+        const result = await voteInstance.vote(1, 0, 0, {from: accounts[2]});
         await voteInstance.vote(0, 0, 0, {from: user});
         const candidate = await voteInstance.getTestResultsOfCandidate(0);
-        console.log("Candidate: ", candidate);
 
-        assert.equal(candidate._voteCount.toString(10), 1);
+        assert.equal(candidate._voteCount.toString(10), 2);
+        await truffleAssert.eventEmitted(result, 'VoteCast', (ev) => {
+          return  ev._candidateId == 0 &&
+                  ev._electionId == 0 &&
+                  ev.timeVoteCast.toString(10) == timestamp.toString(10);
+        });
       });
 
     });
