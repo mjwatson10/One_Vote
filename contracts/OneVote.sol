@@ -39,7 +39,7 @@ contract OneVote is AccessControl{
     event LawAddedForVote(string _lawName, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _lawId);
 
     //emitted when vote has been cast
-    event VoteCast(uint256 _candidateId, uint256 _electionId, uint256 timeVoteCast);
+    event VoteCast(uint256 _candidateId, uint256 _electionId, uint64 timeVoteCast);
 
 //STRUCTS
     //use date object for all dates
@@ -64,7 +64,7 @@ contract OneVote is AccessControl{
         uint256 zipCode;
         uint64 electionStart;
         uint64 electionEnd; */
-        uint256 voteCount;
+        uint64 voteCount;
         uint64 dateApprovedToRun;
         uint256 candidateId;
     }
@@ -184,20 +184,22 @@ contract OneVote is AccessControl{
       function _getCitizen(uint256 _citizenId)internal view returns(
             string memory _name,
             int64 _dateOfBirth,
-            uint256 _zipCode
+            uint256 _zipCode,
+            bool _citizenship
           )
       {
-        require(citizenIndexToOwner[_citizenId] == msg.sender);
+        require(citizenIndexToOwner[_citizenId] == msg.sender || hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "Address does not have access to this information");
                 Citizen storage citizen = citizens[_citizenId];
 
                     _name = citizen.name;
                     _dateOfBirth = citizen.dateOfBirth;
                     _zipCode = citizen.zipCode;
+                    _citizenship = citizen.citizenship;
       }
 
 
       function getCitizenId(address owner) public view returns(uint256){
-        require(msg.sender == owner);
+        require(msg.sender == owner || hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "Address does not have access to this information");
         return citizenIdOfAddress[owner];
       }
 
@@ -223,6 +225,11 @@ contract OneVote is AccessControl{
 
             stateIdInUse[_citizenId] = false;
             addressInUse[_citizenAddress] = false;
+
+            Citizen storage citizen = citizens[_citizenId];
+            citizen.citizenship = false;
+
+            emit NoLongerACitizen(_citizenId, _citizenAddress, _reason);
           }
 
 
@@ -281,8 +288,7 @@ contract OneVote is AccessControl{
       function getCandidate(uint256 _candidateId) public view returns(
             string memory name,
             string memory officeTitle,
-            uint256 zipCode,
-            uint256 voteCount
+            uint256 zipCode
           )
         {
           Candidate storage candidate = candidates[_candidateId];
@@ -292,7 +298,6 @@ contract OneVote is AccessControl{
           name = citizen.name;
           officeTitle = office.officeTitle;
           zipCode = office.zipCode;
-          voteCount = candidate.voteCount;
         }
 
 
@@ -490,7 +495,7 @@ contract OneVote is AccessControl{
             string memory _officeTitle,
             uint256 _zipCode,
             string memory _candidateName,
-            uint256 _voteCount
+            uint64 _voteCount
           )
       {
         Candidate storage candidate = candidates[_candidateId];
@@ -517,11 +522,24 @@ contract OneVote is AccessControl{
       }
 
 
-      /*  //returns winner of each election associated with a particular electionId
+      /*  //returns highest amount of votes of each election associated with a particular electionId, this maybe the vote total for multiple candidateIds in the case of ties
           //(full elections may be made of multiple electionIds due to election covering multiple zipCodes)
           //will change officeIsUpForElection to false
           //(this will only change the officeId associated with the particular electionId other officeIds of the same office may remain open until a later date due to office covering multiple zipCodes) */
-      /* function getWinnerOfElectionId(uint256 _electionId) public returns(uint256 _candidateId){
+      function getHighestVoteTotal(uint256 _electionId) public view returns(uint64){
+        Election memory election = elections[_electionId];
+        /* require(election.electionEnd <= uint64(block.timestamp), "Election results are not available until election is close off from voting"); */
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to this data");
 
-      } */
+        uint64 highestVoteCount = 0;
+        uint256 i = 0;
+
+        for(i = 0; i < election.candidateIds.length; i++){
+          Candidate memory candidate = candidates[i];
+          if(candidate.voteCount >= highestVoteCount){
+            highestVoteCount = candidate.voteCount;
+          }
+        }
+        return highestVoteCount;
+      }
 }

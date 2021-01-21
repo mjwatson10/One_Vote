@@ -15,7 +15,7 @@ contract Test is OneVote {
     }
 
 
-  function getCitizen(uint256 _citizenId) public view returns(string memory name, int64 dateOfBirth, uint256 zipCode){
+  function getCitizen(uint256 _citizenId) public view returns(string memory name, int64 dateOfBirth, uint256 zipCode, bool citizenship){
     return _getCitizen(_citizenId);
   }
 
@@ -64,6 +64,22 @@ contract Test is OneVote {
     _zipCode = office.zipCode;
     _candidateName = citizen.name;
     _voteCount = candidate.voteCount;
+  }
+
+
+  function getTestHighestVoteTotal(uint256 _electionId) public view returns(uint64){
+    Election memory election = elections[_electionId];
+
+    uint64 highestVoteCount = 0;
+    uint256 i = 0;
+
+    for(i = 0; i < election.candidateIds.length; i++){
+      Candidate memory candidate = candidates[i];
+      if(candidate.voteCount >= highestVoteCount){
+        highestVoteCount = candidate.voteCount;
+      }
+    }
+    return highestVoteCount;
   }
 
 }

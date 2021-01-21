@@ -34,13 +34,13 @@ const moment = require("moment");
         let dob = dateNeeded("May 19, 1986");
 
         const result = await voteInstance.createCitizen("Mark Watson", dob, 91423, 8372738271, {from: user});
-        const gottenCitizen = await voteInstance.getCitizen(0, {from: user});
+        const citizen = await voteInstance.getCitizen(0, {from: user});
 
-        const citizenZipCode = gottenCitizen.zipCode.toString(10);
+        const citizenZipCode = citizen.zipCode.toString(10);
 
-        assert.equal(gottenCitizen.name, "Mark Watson");
-        assert.equal(gottenCitizen.dateOfBirth, dob);
-        assert.equal(gottenCitizen.zipCode.toString(10), "91423");
+        assert.equal(citizen.name, "Mark Watson");
+        assert.equal(citizen.dateOfBirth, dob);
+        assert.equal(citizen.zipCode.toString(10), "91423");
 
         await truffleAssert.eventEmitted(result, 'CitizenAdded', (ev) => {
           return  ev.owner == user &&
@@ -186,7 +186,6 @@ const moment = require("moment");
         assert.equal(getCandidate.name, "Mark Watson");
         assert.equal(getCandidate.officeTitle, "Mayor");
         assert.equal(getCandidate.zipCode, 91423);
-        assert.equal(getCandidate.voteCount, 0);
 
         await truffleAssert.eventEmitted(result, 'CandidateAdded', (ev) => {
           return  ev._name == "Mark Watson" &&
@@ -353,7 +352,7 @@ const moment = require("moment");
         await truffleAssert.passes(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
       });
 
-      it.only("should get the total number of votes cast for a candidate", async() => {
+      it("should get the total number of votes cast for a candidate", async() => {
         const ageRequired = dateNeeded("June 3, 1961");
         const startDate = dateNeeded("January 1, 2021");
         const endDate = dateNeeded("November 7, 2131");
@@ -373,13 +372,175 @@ const moment = require("moment");
 
         assert.equal(candidate._voteCount.toString(10), 2);
         await truffleAssert.eventEmitted(result, 'VoteCast', (ev) => {
+          //// timestamp function may yield slightly different times depending on how closely each runs to one another
+          //// because the timestamp is being run on in the vote() function and the timestamp function from the test contract
+          /*console.log("Time:   ", timestamp.toString(10));
+          console.log("TimeEV: ", ev.timeVoteCast.toString(10));*/
+
           return  ev._candidateId == 0 &&
-                  ev._electionId == 0 &&
-                  ev.timeVoteCast.toString(10) == timestamp.toString(10);
+                  ev._electionId == 0
+                  //&& ev.timeVoteCast.toString(10) == timestamp.toString(10)
+                  ;
         });
       });
 
-    });
+      it("should NOT allow a citizen to vote because citizenId is not owned by msg.sender", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
 
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: user}));
+      });
+
+      it("should NOT allow a citizen to vote because msg.sender does not have an eligible address to vote", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        const result = await voteInstance.loseOfCitizenship(1, accounts[2], "death", {from: accounts[0]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        await truffleAssert.eventEmitted(result, 'NoLongerACitizen', (ev) => {
+          return  ev.citizenId == 1 &&
+                  ev.citzenAddress == accounts[2] &&
+                  ev.reasonForLoseOfCitizenship == "death";
+        });
+      });
+
+      it("should NOT allow a citizen to vote because citizen has lost citizenship", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.loseOfCitizenship(1, accounts[2], "death", {from: accounts[0]});
+        const citizen = await voteInstance.getCitizen(1, {from: accounts[0]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        assert.equal(citizen.citizenship, false);
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        });
+
+      it("should NOT allow a citizen to vote because election has NOT opened yet", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2022");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        });
+
+      it("should NOT allow a citizen to vote because election is NO LONGER OPEN", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("January 10, 2021");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 91423, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        });
+
+      it("should NOT allow a citizen to vote because citizenId DOES NOT match with zipCode for this particular election's zipCode", async() => {
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const newCitizenAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", newCitizenAge, 92126, 7201936274, {from: accounts[2]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 0, 0, {from: accounts[2]}));
+        });
+
+      });
+
+
+//tests for election results
+    describe("Results", async() => {
+      let citizenAge;
+      let citizenId;
+
+      beforeEach(async() => {
+        citizenAge = dateNeeded("July 20, 1949");
+
+        citizenId = await voteInstance.createCitizen("Mark Watson", citizenAge, 91423, 8372738271, {from: user});
+
+        const ageRequired = dateNeeded("June 3, 1961");
+        const startDate = dateNeeded("January 1, 2021");
+        const endDate = dateNeeded("November 7, 2131");
+
+        const citizenOneAge = dateNeeded("July 20, 1949");
+        await voteInstance.createCitizen("Liam Watson", citizenOneAge, 91423, 7201936274, {from: accounts[2]});
+
+        const citizenTwoAge = dateNeeded("July 20, 1959");
+        await voteInstance.createCitizen("Isaiah Watson", citizenTwoAge, 91423, 7201936265, {from: accounts[3]});
+
+        const citizenThreeAge = dateNeeded("July 20, 1939");
+        await voteInstance.createCitizen("Melissa Watson", citizenThreeAge, 91423, 7201936255, {from: accounts[4]});
+
+        const citizenFourAge = dateNeeded("July 20, 1929");
+        await voteInstance.createCitizen("Brock Watson", citizenFourAge, 91423, 7201936245, {from: accounts[5]});
+
+        await voteInstance.createOffice("Mayor", 91423, ageRequired);
+        await voteInstance.createAnElection(0, startDate, endDate);
+
+        await voteInstance.createCandidate(0, 8372738271, 0, 0, {from: user});
+        await voteInstance.createCandidate(4, 7201936245, 0, 0, {from: accounts[5]});
+      });
+
+      it("should find the highest vote count amongst all candidates in an election", async() => {
+        await voteInstance.vote(0, 0, 0, {from: user});
+        await voteInstance.vote(1, 0, 0, {from: accounts[2]});
+        await voteInstance.vote(2, 0, 0, {from: accounts[3]});
+
+        await voteInstance.vote(3, 1, 0, {from: accounts[4]});
+        await voteInstance.vote(4, 1, 0, {from: accounts[5]});
+
+        const highest = await voteInstance.getHighestVoteTotal(0);
+
+        console.log("Highest: ", highest.toString(10));
+
+        assert.equal(highest, 3);
+      });
+    });
 
     });
