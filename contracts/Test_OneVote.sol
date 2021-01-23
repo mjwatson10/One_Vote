@@ -1,9 +1,9 @@
-pragma solidity ^0.6.6;
+pragma solidity ^0.7.0;
 
 import "./OneVote.sol";
 
 
-contract Test is OneVote {
+contract Test is OneVote{
 
   function createCitizen(
     string memory _name,
@@ -34,8 +34,8 @@ contract Test is OneVote {
   }
 
 
-  function filledOfficePosition(uint256 _officeId, uint256 _candidateId) public {
-    _filledOfficePosition(_officeId, _candidateId);
+  function filledOfficePosition(uint256 _candidateId) public {
+    _filledOfficePosition(_candidateId);
   }
 
 
@@ -70,6 +70,8 @@ contract Test is OneVote {
   function getTestHighestVoteTotal(uint256 _electionId) public view returns(uint64){
     Election memory election = elections[_electionId];
 
+    require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to this data");
+
     uint64 highestVoteCount = 0;
     uint256 i = 0;
 
@@ -81,5 +83,32 @@ contract Test is OneVote {
     }
     return highestVoteCount;
   }
+
+
+  function winnerOfTestElection(uint256 _candidateId) public {
+    Candidate memory candidate = candidates[_candidateId];
+    require(getTestHighestVoteTotal(candidate.electionId) == candidate.voteCount, "This candidate does not have the highest amount of vote");
+
+    filledOfficePosition(_candidateId);
+
+    emit Winner(_candidateId, candidate.officeId, candidate.voteCount, uint64(block.timestamp), msg.sender);
+  }
+
+
+  /* function getTestIdOfWinningCandidates(uint256 _electionId) public view returns(uint256[] memory){
+    Election memory election = elections[_electionId];
+
+    uint64 highestVoteCount = getTestHighestVoteTotal(_electionId);
+    uint256[] memory result = new uint256[](election.candidateIds.length);
+
+    for(uint256 i = 0; i < election.candidateIds.length; i++){
+      Candidate memory candidate = candidates[i];
+      if(candidate.voteCount == highestVoteCount){
+        result[i] = candidate.candidateId;
+      }
+    }
+    return result;
+  } */
+
 
 }

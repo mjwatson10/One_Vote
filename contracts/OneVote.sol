@@ -1,16 +1,13 @@
-pragma solidity ^0.6.6;
+pragma solidity ^0.7.0;
 
 import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
-import "../node_modules/@openzeppelin/contracts/math/SignedSafeMath.sol";
 import "../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
-//see if can use TimedCrowdsale.sol for election time and TimelockController
 
 
 
 contract OneVote is AccessControl{
 
     using SafeMath for uint256;
-    using SignedSafeMath for int256;
 
 
 //EVENTS
@@ -29,17 +26,15 @@ contract OneVote is AccessControl{
     //emitted when an office is create
     event OfficeAdded(string _officeTitle, uint256 _zipCode, uint256 _officeId);
 
-    //emitted when office position is filled and no longer open until next office position is created
-    event OfficePositionIsFilledBy(string _officeTitle, string _name, uint256 zipCode);
-
     //emitted when a election is created
     event ElectionAdded(string _officeTitle, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _electionId);
 
-    //emitted when new law is created for a vote, does not stat that law is approved
-    event LawAddedForVote(string _lawName, uint256 _zipCode, uint64 _electionStart, uint64 _electionEnd, uint256 _lawId);
-
     //emitted when vote has been cast
     event VoteCast(uint256 _candidateId, uint256 _electionId, uint64 timeVoteCast);
+
+    //emitted when winner of election is determined
+    event Winner(uint256 _candidateId, uint256 _officeId, uint64 _voteCount, uint64 timestamp, address confirmedBy);
+
 
 //STRUCTS
     //use date object for all dates
@@ -87,25 +82,12 @@ contract OneVote is AccessControl{
         uint256[] candidateIds;
     }
 
-    struct Law {
-        string lawName;
-        uint256 zipCode;
-        uint64 electionStart;
-        uint64 electionEnd;
-        uint256 voteFor;
-        uint256 voteAgainst;
-        uint64 dateApprovedForVote;
-        bool approvedForVote;
-        uint256 lawId;
-    }
-
 
 //ARRAYS
     Citizen[] citizens;
     Candidate[] candidates;
     Office[] offices;
     Election[] elections;
-    Law[] laws;
 
     //citizen mapping
     /// @dev citizen mapping needs to be private after testing
@@ -127,14 +109,16 @@ contract OneVote is AccessControl{
     /* mapping(uint256 => Election) public electionIdToElection; */
     /* mapping(uint256 => bool) public electionIsActive; */
 
-    //law mapping
-    /* mapping(uint256 => Law) public lawIdToLaw; */
-
 
 //CONSTRUCTOR
-    /*    // will set access control as contract owner upon deploying contract */
+    /*    // will set access control as contract owner upon deploying contract
+          // all arrays at elements at index 0 will empty */
     constructor() public {
       _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+      elections.push();
+      citizens.push();
+      offices.push();
+      candidates.push();
     }
 
 
@@ -347,72 +331,15 @@ contract OneVote is AccessControl{
 
 
       /* //changes status of open offices after elections */
-      function _filledOfficePosition(uint256 _officeId, uint256 _candidateId) internal {
-        require(officeIsUpForElection[_officeId] == true);
+      function _filledOfficePosition(uint256 _candidateId) internal {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to closing an office position");
 
         Candidate memory candidate = candidates[_candidateId];
-        Office memory candidateOffice = offices[candidate.officeId];
-        Office memory office = offices[_officeId];
-        Citizen memory citizen = citizens[candidate.citizenId];
 
-        require(office.zipCode == candidateOffice.zipCode);
+        require(officeIsUpForElection[candidate.officeId] == true, "This position was not up for election");
 
-        officeIsUpForElection[_officeId] = false;
-
-        emit OfficePositionIsFilledBy(office.officeTitle, citizen.name, office.zipCode);
+        officeIsUpForElection[candidate.officeId] = false;
       }
-
-
-      /*  //emit event when law is created
-          //will need array for zipCodes */
-      function createALaw(
-              string memory _lawName,
-              uint256 _zipCode,
-              uint64 _start,
-              uint64 _end
-          ) public returns(uint256){
-
-            Law memory _law = Law({
-                lawName: _lawName,
-                zipCode: _zipCode,
-                electionStart: _start,
-                electionEnd: _end,
-                voteFor: 0,
-                voteAgainst: 0,
-                dateApprovedForVote: uint64(block.timestamp),
-                approvedForVote: true,
-                lawId: laws.length
-              });
-
-          laws.push(_law);
-          uint256 newLawId = laws.length - 1;
-
-          /* lawIdToLaw[newLawId] = _law; */
-
-          emit LawAddedForVote(_lawName, _zipCode, _start, _end, newLawId);
-
-        return newLawId;
-      }
-
-
-      function getLaw(uint256 _lawId) public view returns(
-            string memory lawName,
-            uint256 zipCode,
-            uint64 electionStart,
-            uint64 electionEnd,
-            uint256 voteFor,
-            uint256 voteAgainst
-          )
-        {
-          Law storage law = laws[_lawId];
-
-          lawName = law.lawName;
-          zipCode = law.zipCode;
-          electionStart = law.electionStart;
-          electionEnd = law.electionEnd;
-          voteFor = law.voteFor;
-          voteAgainst = voteAgainst;
-        }
 
 
       /*  //emit event when election is created
@@ -453,7 +380,8 @@ contract OneVote is AccessControl{
             string memory officeTitle,
             uint256 zipCode,
             uint64 electionStart,
-            uint64 electionEnd
+            uint64 electionEnd,
+            uint256[] memory candidateIds
           )
         {
           Election storage election = elections[_electionId];
@@ -463,6 +391,7 @@ contract OneVote is AccessControl{
           zipCode = office.zipCode;
           electionStart = election.electionStart;
           electionEnd = election.electionEnd;
+          candidateIds = election.candidateIds;
         }
 
 
@@ -515,11 +444,11 @@ contract OneVote is AccessControl{
 
 
       /*  //returns all candidateIds contained in an election struct based on an electionId */
-      function getAllCandidateIds(uint256 _electionId) public view returns (uint256[] memory){
+      /* function getAllCandidateIds(uint256 _electionId) public view returns (uint256[] memory){
         Election memory election = elections[_electionId];
 
         return election.candidateIds;
-      }
+      } */
 
 
       /*  //returns highest amount of votes of each election associated with a particular electionId, this maybe the vote total for multiple candidateIds in the case of ties
@@ -528,13 +457,12 @@ contract OneVote is AccessControl{
           //(this will only change the officeId associated with the particular electionId other officeIds of the same office may remain open until a later date due to office covering multiple zipCodes) */
       function getHighestVoteTotal(uint256 _electionId) public view returns(uint64){
         Election memory election = elections[_electionId];
-        /* require(election.electionEnd <= uint64(block.timestamp), "Election results are not available until election is close off from voting"); */
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to this data");
+        require(election.electionEnd <= uint64(block.timestamp), "Election results are not available until election is closed off from voting");
+        /* require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to this data"); */
 
         uint64 highestVoteCount = 0;
-        uint256 i = 0;
 
-        for(i = 0; i < election.candidateIds.length; i++){
+        for(uint256 i = 0; i <= election.candidateIds.length; i++){
           Candidate memory candidate = candidates[i];
           if(candidate.voteCount >= highestVoteCount){
             highestVoteCount = candidate.voteCount;
@@ -542,4 +470,33 @@ contract OneVote is AccessControl{
         }
         return highestVoteCount;
       }
+
+
+      /* //will return an array of one or all candidates that have the highest amount of votes
+      function getIdOfWinningCandidates(uint256 _electionId) public view returns(uint256[] memory){
+        Election memory election = elections[_electionId];
+
+        uint64 highestVoteCount = getHighestVoteTotal(_electionId);
+        uint256[] memory result = new uint256[](election.candidateIds.length);
+
+        for(uint256 i = 0; i <= election.candidateIds.length; i++){
+          Candidate memory candidate = candidates[i];
+          if(candidate.voteCount == highestVoteCount){
+            result[i] = candidate.candidateId;
+          }
+        }
+        return result;
+      } */
+
+
+      /*  //will set the office up for election as no longer open and emit event stating the winner of the election */
+      function winnerOfElection(uint256 _candidateId) public {
+        Candidate memory candidate = candidates[_candidateId];
+        require(getHighestVoteTotal(candidate.electionId) == candidate.voteCount, "This candidate does not have the highest amount of vote");
+
+        _filledOfficePosition(_candidateId);
+
+        emit Winner(_candidateId, candidate.officeId, candidate.voteCount, uint64(block.timestamp), msg.sender);
+      }
+
 }
