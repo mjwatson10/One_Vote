@@ -85,7 +85,7 @@ contract Test is OneVote{
   }
 
 
-  function winnerOfTestElection(uint256 _candidateId) public {
+  function declareWinnerOfTestElection(uint256 _candidateId) public {
     Candidate memory candidate = candidates[_candidateId];
     require(getTestHighestVoteTotal(candidate.electionId) == candidate.voteCount, "This candidate does not have the highest amount of vote");
 

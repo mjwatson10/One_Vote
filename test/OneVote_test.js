@@ -560,7 +560,7 @@ const moment = require("moment");
       //   //assert.equal(result[3], 3);
       // });
 
-      it("should allow admin to enter the winner of an election and emit winner event", async() => {
+      it.only("should allow admin to enter the winner of an election and emit winner event", async() => {
         await voteInstance.vote(1, 1, 1, {from: user});
         await voteInstance.vote(2, 2, 1, {from: accounts[2]});
         await voteInstance.vote(3, 2, 1, {from: accounts[3]});
@@ -568,7 +568,7 @@ const moment = require("moment");
         await voteInstance.vote(4, 2, 1, {from: accounts[4]});
         await voteInstance.vote(5, 2, 1, {from: accounts[5]});
 
-        const result = await voteInstance.winnerOfTestElection(2, {from: accounts[0]});
+        const result = await voteInstance.declareWinnerOfTestElection(2, {from: accounts[0]});
 
         truffleAssert.eventEmitted(result, 'Winner', (ev) => {
           return  ev._candidateId == 2 &&
@@ -579,7 +579,7 @@ const moment = require("moment");
         });
       });
 
-      it("should NOT allow winner of an election to be entered because msg.sender is not approved to do so", async() => {
+      it.only("should NOT allow winner of an election to be entered because msg.sender is not approved to do so", async() => {
         await voteInstance.vote(1, 1, 1, {from: user});
         await voteInstance.vote(2, 2, 1, {from: accounts[2]});
         await voteInstance.vote(3, 2, 1, {from: accounts[3]});
@@ -587,7 +587,7 @@ const moment = require("moment");
         await voteInstance.vote(4, 2, 1, {from: accounts[4]});
         await voteInstance.vote(5, 2, 1, {from: accounts[5]});
 
-        await truffleAssert.fails(voteInstance.winnerOfTestElection(2, {from: accounts[1]}));
+        await truffleAssert.fails(voteInstance.declareWinnerOfTestElection(2, {from: accounts[1]}));
       });
 
       it.only("should NOT allow winner of an election to be entered because election has NOT comcluded", async() => {
@@ -598,7 +598,7 @@ const moment = require("moment");
         await voteInstance.vote(4, 2, 1, {from: accounts[4]});
         await voteInstance.vote(5, 2, 1, {from: accounts[5]});
 
-        await truffleAssert.fails(voteInstance.winnerOfElection(2, {from: accounts[1]}));
+        await truffleAssert.fails(voteInstance.declareWinnerOfTestElection(2, {from: accounts[1]}));
       });
 
     });

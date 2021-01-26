@@ -494,9 +494,10 @@ contract OneVote is AccessControl{
 
 
       /*  //will set the office up for election as no longer open and emit event stating the winner of the election */
-      function winnerOfElection(uint256 _candidateId) public {
+      function declareWinnerOfElection(uint256 _candidateId) public {
         Candidate memory candidate = candidates[_candidateId];
         require(getHighestVoteTotal(candidate.electionId) == candidate.voteCount, "This candidate does not have the highest amount of vote");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true || hasRole(LOCAL_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to declaring a winner of this election");
 
         _filledOfficePosition(_candidateId);
 
