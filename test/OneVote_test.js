@@ -598,7 +598,7 @@ const moment = require("moment");
         await voteInstance.vote(4, 2, 1, {from: accounts[4]});
         await voteInstance.vote(5, 2, 1, {from: accounts[5]});
 
-        await truffleAssert.passes(voteInstance.winnerOfElection(2, {from: accounts[1]}));
+        await truffleAssert.fails(voteInstance.winnerOfElection(2, {from: accounts[1]}));
       });
 
     });

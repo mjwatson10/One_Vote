@@ -122,6 +122,9 @@ contract OneVote is AccessControl{
     }
 
 
+//ROLES
+        bytes32 public constant LOCAL_ADMIN_ROLE = keccak256("LOCAL_ADMIN_ROLE");
+
 
 //FUNCTIONS
 ////creation functions
@@ -293,6 +296,7 @@ contract OneVote is AccessControl{
               uint256 _zipCode,
               int64 _requiredAge
           ) public returns(uint256){
+            require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true || hasRole(LOCAL_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to creating an office position");
 
             Office memory _office = Office({
                   officeTitle: _officeTitle,
@@ -332,7 +336,7 @@ contract OneVote is AccessControl{
 
       /* //changes status of open offices after elections */
       function _filledOfficePosition(uint256 _candidateId) internal {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to closing an office position");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true || hasRole(LOCAL_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to closing an office position");
 
         Candidate memory candidate = candidates[_candidateId];
 
@@ -350,7 +354,7 @@ contract OneVote is AccessControl{
               uint64 _end
           ) public returns(uint256){
             require(officeIsUpForElection[_officeId] == true, "Office is NOT up for election");
-            require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to creating an election");
+            require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) == true || hasRole(LOCAL_ADMIN_ROLE, msg.sender) == true, "You do NOT have access to creating an election");
 
             elections.push();
 
