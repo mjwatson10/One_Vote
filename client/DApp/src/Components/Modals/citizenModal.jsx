@@ -1,55 +1,53 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
-import * as ReactBootStrap from 'react-bootstrap';
+import axios from 'axios';
+
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
 
 
 function CitizenModal(props){
 
-    function MyVerticallyCenteredModal(props) {
       return (
-        <ReactBootStrap.Modal
-          {...props}
-          size="lg"
-          aria-labelledby="contained-modal-title-vcenter"
-          centered
-        >
-          <ReactBootStrap.Modal.Header closeButton>
-            <ReactBootStrap.Modal.Title id="contained-modal-title-vcenter">
-              Modal heading
-            </ReactBootStrap.Modal.Title>
-          </ReactBootStrap.Modal.Header>
-          <ReactBootStrap.Modal.Body>
-            <h4>Centered Modal</h4>
-            <p>
-              Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-              dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-              consectetur ac, vestibulum at eros.
-            </p>
-          </ReactBootStrap.Modal.Body>
-          <ReactBootStrap.Modal.Footer>
-            <ReactBootStrap.Button onClick={props.onHide}>Close</ReactBootStrap.Button>
-          </ReactBootStrap.Modal.Footer>
-        </ReactBootStrap.Modal>
+            <Form>
+                <Form.Row>
+                  <Form.Group as={Col} controlId="formGridFirstName">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control placeholder="Enter First Name" />
+                  </Form.Group>
+
+                  <Form.Group as={Col} controlId="formGridLastName">
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control placeholder="Enter Last Name" />
+                  </Form.Group>
+
+                  <Form.Group as={Col} controlId="formGridDOB">
+                      <Form.Label>Select Date</Form.Label>
+                      <Form.Control type="date" name="dob" placeholder="Date of Birth" />
+                  </Form.Group>
+                </Form.Row>
+
+                <Form.Group as={Col} controlId="formGridStateId">
+                    <Form.Label>State ID</Form.Label>
+                    <Form.Control placeholder="Generate State ID" />
+                  </Form.Group>
+
+                <Button variant="primary" type="submit" id="generatorBTN">
+                Generate State ID
+                </Button>
+
+                <Form.Row>
+                  <Form.Group as={Col} controlId="formGridZip">
+                    <Form.Label>Zip</Form.Label>
+                    <Form.Control />
+                  </Form.Group>
+                </Form.Row>
+
+              </Form>
       );
     }
 
-    function HandleCitizenModal() {
-      const [modalShow, setModalShow] = React.useState(false);
-
-      return (
-        <>
-          <ReactBootStrap.Button variant="primary" onClick={() => setModalShow(true)}>
-            Launch vertically centered modal
-          </ReactBootStrap.Button>
-
-          <MyVerticallyCenteredModal
-            show={modalShow}
-            onHide={() => setModalShow(false)}
-          />
-        </>
-      );
-    }
-
-}
 
 export default CitizenModal;
