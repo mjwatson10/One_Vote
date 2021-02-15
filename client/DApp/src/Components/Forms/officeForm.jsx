@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
 
-function OfficenModal(props){
+function OfficeForm(props){
 
       return (
         <Form>
@@ -29,9 +29,10 @@ function OfficenModal(props){
                   <Form.Label>Select Date</Form.Label>
                   <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" />
               </Form.Group>
+            </Form.Row>
           </Form>
       );
     }
 
 
-export default OfficenModal;
+export default OfficeForm;

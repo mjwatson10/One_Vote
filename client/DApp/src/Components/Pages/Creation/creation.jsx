@@ -1,7 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import Navigation from '../../HeaderFooter/header.jsx';
 import Footer from '../../HeaderFooter/footer.jsx';
-import CitizenModal from '../../Modals/citizenModal.jsx';
+import CitizenForm from '../../Forms/citizenForm.jsx';
+import OfficeForm from '../../Forms/officeForm.jsx';
+import ElectionForm from '../../Forms/electionForm.jsx';
+import CandidateForm from '../../Forms/candidateForm.jsx';
 
 import axios from 'axios';
 
@@ -46,41 +49,7 @@ function Creation(props) {
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
 
-            <Form>
-                <Form.Row>
-                  <Form.Group as={Col} controlId="formGridFirstName">
-                    <Form.Label>First Name</Form.Label>
-                    <Form.Control placeholder="Enter First Name" />
-                  </Form.Group>
-
-                  <Form.Group as={Col} controlId="formGridLastName">
-                    <Form.Label>Last Name</Form.Label>
-                    <Form.Control placeholder="Enter Last Name" />
-                  </Form.Group>
-
-                  <Form.Group as={Col} controlId="dob">
-                      <Form.Label>Select Date</Form.Label>
-                      <Form.Control type="date" name="dob" placeholder="Date of Birth" />
-                  </Form.Group>
-                </Form.Row>
-
-                <Form.Group as={Col} controlId="formGridCitizenId">
-                    <Form.Label>CitizenId</Form.Label>
-                    <Form.Control placeholder="Generate Citizen Id" />
-                  </Form.Group>
-
-                <Button variant="primary" type="submit" id="generatorBTN">
-                Generate CitizenId
-                </Button>
-
-                <Form.Row>
-                  <Form.Group as={Col} controlId="formGridZip">
-                    <Form.Label>Zip</Form.Label>
-                    <Form.Control />
-                  </Form.Group>
-                </Form.Row>
-
-              </Form>
+          <CitizenForm />
 
           <Modal.Footer>
             <Button variant="primary" type="submit" onClick={handleClose}>
@@ -90,11 +59,11 @@ function Creation(props) {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-
           </Modal.Footer>
         </Modal>
 
       </header>
+
       <Footer />
     </div>
   );

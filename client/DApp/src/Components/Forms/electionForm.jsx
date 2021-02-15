@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
 
-function ElectionModal(props){
+function ElectionForm(props){
 
       return (
         <Form>
@@ -29,9 +29,10 @@ function ElectionModal(props){
                   <Form.Label>Select Date</Form.Label>
                   <Form.Control type="date" name="end" placeholder="End Date of Election" />
               </Form.Group>
+            </Form.Row>
           </Form>
       );
     }
 
 
-export default ElectionModal;
+export default ElectionForm;

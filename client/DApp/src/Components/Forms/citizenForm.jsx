@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
 
-function CitizenModal(props){
+function CitizenForm(props){
 
       return (
             <Form>
@@ -50,4 +50,4 @@ function CitizenModal(props){
     }
 
 
-export default CitizenModal;
+export default CitizenForm;

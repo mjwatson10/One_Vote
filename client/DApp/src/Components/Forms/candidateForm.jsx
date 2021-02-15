@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
 
-function CandidateModal(props){
+function CandidateForm(props){
 
       return (
             <Form>
@@ -31,12 +31,13 @@ function CandidateModal(props){
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="formGridElectionId">
-                    <Form.Label>Elenection ID</Form.Label>
-                    <Form.Control placeholder="Enter Elenection ID" />
+                    <Form.Label>Election ID</Form.Label>
+                    <Form.Control placeholder="Enter Election ID" />
                   </Form.Group>
+                </Form.Row>
               </Form>
       );
     }
 
 
-export default CandidateModal;
+export default CandidateForm;
