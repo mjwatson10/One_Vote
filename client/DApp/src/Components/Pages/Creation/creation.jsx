@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import Proptypes from 'prop-types';
+
 import Navigation from '../../HeaderFooter/header.jsx';
 import Footer from '../../HeaderFooter/footer.jsx';
 import CitizenForm from '../../Forms/citizenForm.jsx';
@@ -16,13 +18,6 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
 
-const options = [
-  {label: 'Citizen', value: 'citizen'},
-  {label: 'Office', value: 'office'},
-  {label: 'Election', value: 'election'},
-  {label: 'Candidate', value: 'candidate'}
-]
-
 const Section = styled.section`
     width: 250px;
     max-width: 600px;
@@ -31,67 +26,65 @@ const Section = styled.section`
   `;
 
 
-const onChangeInput = (value) => {
-  console.log(value);
-
-  if (value === options[0]) {
-    return <CitizenForm />
-  } else if (value === options[1]) {
-    return <OfficeForm />
-  } else if (value === options[2]) {
-    return <ElectionForm />
-  } else if (value === options[3]) {
-    return <CandidateForm />
-  } else {
-    alert("Please select a form");
+function Creation(props) {
+  const [showCitizenForm, setShowCitizenForm] = useState(false);
+  const handleCloseCitizenForm = () => {
+    setShowCitizenForm(oldValue => !oldValue);
   }
-}
+  const handleShowCitizenForm = () => {
+    setShowCitizenForm(oldValue => !oldValue);
+  }
 
+  const [showOfficeForm, setShowOfficeForm] = useState(false);
+  const handleCloseOfficeForm = () => {
+    setShowOfficeForm(oldValue => !oldValue);
+  }
+  const handleShowOfficeForm = () => {
+    setShowOfficeForm(oldValue => !oldValue);
+  }
 
-function Creation(props, {style}) {
-  const [show, setShow] = useState(false);
+  const [showElectionForm, setShowElectionForm] = useState(false);
+  const handleCloseElectionForm = () => {
+    setShowElectionForm(oldValue => !oldValue);
+  }
+  const handleShowElectionForm = () => {
+    setShowElectionForm(oldValue => !oldValue);
+  }
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-
+  const [showCandidateForm, setShowCandidateForm] = useState(false);
+  const handleCloseCandidateForm = () => {
+    setShowCandidateForm(oldValue => !oldValue);
+  }
+  const handleShowCandidateForm = () => {
+    setShowCandidateForm(oldValue => !oldValue);
+  }
 
   return(
     <div className="App">
       <Navigation />
       <header className="App-header">
         <h1>Creation</h1>
-        <Form.Group>
-          <Section>
-            <Select options={options} onChange={onChangeInput} />
-          </Section>
-          <br />
-        </Form.Group>
 
-        <button id="creationSubmit" onClick={handleShow}>Submit</button>
-
-
-        <Modal show={show} onHide={handleClose}
-          size="lg"
-          aria-labelledby="contained-modal-title-vcenter"
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
-          </Modal.Header>
-
-          /*<CitizenForm />*/
-
-          <Modal.Footer>
-            <Button variant="primary" type="submit" onClick={handleClose}>
-            Submit
-            </Button>
-
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
+        <CitizenForm
+          showCitizenForm={showCitizenForm}
+          handleShowCitizenForm={handleShowCitizenForm}
+          handleCloseCitizenForm={handleCloseCitizenForm}
+        />
+        <OfficeForm
+          showOfficeForm={showOfficeForm}
+          handleShowOfficeForm={handleShowOfficeForm}
+          handleCloseOfficeForm={handleCloseOfficeForm}
+        />
+        <ElectionForm
+          showElectionForm={showElectionForm}
+          handleShowElectionForm={handleShowElectionForm}
+          handleCloseElectionForm={handleCloseElectionForm}
+        />
+        <CandidateForm
+          showCandidateForm={showCandidateForm}
+          handleShowCandidateForm={handleShowCandidateForm}
+          handleCloseCandidateForm={handleCloseCandidateForm}
+        />
 
       </header>
 
