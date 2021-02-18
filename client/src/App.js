@@ -37,6 +37,7 @@ function App() {
 
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
+        console.log("web3: ", web3);
         setWeb3(web3);
         setAccounts(accounts);
         setContract(contract);
@@ -48,12 +49,10 @@ function App() {
         console.error(error);
       }
     }
-    console.log("Init: ", init);
     init();
-  }, []);
 
-  useEffect(() => {
     const load = async() => {
+      try {
       // Stores a given value, 5 by default.
       await contract.methods.set(5).send({ from: accounts[0] });
 
@@ -62,13 +61,15 @@ function App() {
 
       // Update state with the result.
       setVoteValue(response);
-          }
 
+} catch(error){
     if(typeof web3 !== 'undefined'
         && typeof accounts !== 'undefined'
         && typeof contract !== 'undefined') {
           load();
         }
+      }
+    }
   }, [web3, accounts, contract]);
 
   if(typeof web3 === 'undefined') {
