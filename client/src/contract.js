@@ -1,4 +1,6 @@
-var abi = [
+export const contractAddress = '0x1327CAa6E1d67fb333A85C4CDB25EAc7B701e0A0';
+
+export const abi = [
   {
     "anonymous": false,
     "inputs": [

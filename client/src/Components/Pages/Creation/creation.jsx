@@ -17,6 +17,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
+import Web3 from 'web3';
+
 
 const Section = styled.section`
     width: 250px;

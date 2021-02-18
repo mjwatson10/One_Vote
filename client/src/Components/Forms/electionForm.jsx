@@ -33,12 +33,12 @@ function ElectionForm(props){
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridStartDate">
-                        <Form.Label>Select Date</Form.Label>
+                        <Form.Label>Start Date of Election</Form.Label>
                         <Form.Control type="date" name="start" placeholder="Start Date of Election" />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridEndDate">
-                        <Form.Label>Select Date</Form.Label>
+                        <Form.Label>End Date of Election</Form.Label>
                         <Form.Control type="date" name="end" placeholder="End Date of Election" />
                     </Form.Group>
                   </Form.Row>

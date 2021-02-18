@@ -38,7 +38,7 @@ function OfficeForm(props){
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
-                        <Form.Label>Select Date</Form.Label>
+                        <Form.Label>Minimum Age Required</Form.Label>
                         <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" />
                     </Form.Group>
                   </Form.Row>

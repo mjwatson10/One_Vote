@@ -9,6 +9,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 
+import Web3 from 'web3';
+
 
 function CitizenForm(props){
       return (
@@ -36,7 +38,7 @@ function CitizenForm(props){
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
-                        <Form.Label>Select Date</Form.Label>
+                        <Form.Label>Date Of Birth</Form.Label>
                         <Form.Control type="date" name="dob" placeholder="Date of Birth" />
                     </Form.Group>
                   </Form.Row>
