@@ -48,6 +48,7 @@ function App() {
         console.error(error);
       }
     }
+    console.log("Init: ", init);
     init();
   }, []);
 
