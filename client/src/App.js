@@ -11,8 +11,6 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as ReactBootStrap from 'react-bootstrap';
 
-import Web3 from 'web3';
-
 
 function App() {
   const [voteValue, setVoteValue] = useState(undefined);
@@ -50,8 +48,8 @@ function App() {
         console.error(error);
       }
     }
+    init();
   }, []);
-
 
   useEffect(() => {
     const load = async() => {
