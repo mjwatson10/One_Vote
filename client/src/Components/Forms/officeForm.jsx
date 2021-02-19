@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { useForm } from "react-hook-form";
 import Proptypes from 'prop-types';
 
 import axios from 'axios';
@@ -10,6 +11,11 @@ import Col from 'react-bootstrap/Col';
 
 
 function OfficeForm(props){
+  const { register, handleSubmit, watch, errors } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  }
 
       return (
         <>
@@ -18,6 +24,7 @@ function OfficeForm(props){
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Modal.Header closeButton>
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
@@ -27,19 +34,19 @@ function OfficeForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeName">
                       <Form.Label>Office Name</Form.Label>
-                      <Form.Control placeholder="Enter Office Name" />
+                      <Form.Control type="text" name="officeName" placeholder="Enter Office Name" ref={register} />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridZip">
-                      <Form.Label>Zip</Form.Label>
-                      <Form.Control />
+                      <Form.Label>Zip Code</Form.Label>
+                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register} />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
                         <Form.Label>Minimum Age Required</Form.Label>
-                        <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" />
+                        <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" ref={register} />
                     </Form.Group>
                   </Form.Row>
               </Form>
@@ -54,6 +61,7 @@ function OfficeForm(props){
               Close
             </Button>
           </Modal.Footer>
+          </Form>
         </Modal>
 
         <Button variant="primary" type="submit" onClick={props.handleShowOfficeForm}>

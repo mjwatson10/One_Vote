@@ -34,7 +34,7 @@ function App() {
           OneVote.abi,
           deployedNetwork && deployedNetwork.address,
         );
-
+        
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
         console.log("web3: ", web3);
@@ -71,10 +71,6 @@ function App() {
       }
     }
   }, [web3, accounts, contract]);
-
-  if(typeof web3 === 'undefined') {
-    return <div>Loading Web3, accounts, and contract...</div>;
-  }
 
   return (
     <>
