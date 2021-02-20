@@ -12,7 +12,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import * as ReactBootStrap from 'react-bootstrap';
 
 
-function App() {
+function App(props) {
   const [voteValue, setVoteValue] = useState(undefined);
   const [web3, setWeb3] = useState(undefined);
   const [accounts, setAccounts] = useState(undefined);
@@ -34,10 +34,11 @@ function App() {
           OneVote.abi,
           deployedNetwork && deployedNetwork.address,
         );
-        
+
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
         console.log("web3: ", web3);
+        console.log("Methods: ", contract);
         setWeb3(web3);
         setAccounts(accounts);
         setContract(contract);
@@ -78,7 +79,10 @@ function App() {
         <Switch>
           <Route exact strict path="/" component={HomePage} />
           <Route exact strict path="/Home" component={HomePage} />
-          <Route exact strict path="/Creation" component={Creation} />
+          <Route exact strict path="/Creation" component={Creation}
+            contract={contract}
+            accounts={accounts}
+          />
         </Switch>
       </BrowserRouter>
     </>

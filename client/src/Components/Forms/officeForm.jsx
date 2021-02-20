@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 
 
 function OfficeForm(props){
@@ -64,9 +65,17 @@ function OfficeForm(props){
           </Form>
         </Modal>
 
-        <Button variant="primary" type="submit" onClick={props.handleShowOfficeForm}>
-        Office Form
-        </Button>
+        <Card style={{ width: '18rem', margin: '15px'}}>
+          <Card.Body>
+            <Card.Title style={{ color: 'black'}}>Create Office</Card.Title>
+            <Card.Text style={{ color: 'black'}}>
+              This will allow you to create an Office for an Election.
+            </Card.Text>
+              <Button variant="primary" type="submit" onClick={props.handleShowOfficeForm}>
+              Office Form
+              </Button>
+            </Card.Body>
+          </Card>
         </>
       );
     }

@@ -2,13 +2,14 @@ import React, {useState, useEffect} from 'react';
 import { useForm } from "react-hook-form";
 import Proptypes from 'prop-types';
 
-
 import axios from 'axios';
+import styled from 'styled-components';
 
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 
 import Web3 from 'web3';
 
@@ -35,13 +36,8 @@ function CitizenForm(props){
           <Modal.Body>
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridFirstName">
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control type="text" name="firstName" placeholder="Enter First Name" ref={register} />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="formGridLastName">
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control type="text" name="lastName" placeholder="Enter Last Name" ref={register} />
+                      <Form.Label>Full Name</Form.Label>
+                      <Form.Control type="text" name="fullName" placeholder="Enter Full Name" ref={register} />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
@@ -79,9 +75,17 @@ function CitizenForm(props){
           </Form>
         </Modal>
 
-        <Button variant="primary" type="submit" onClick={props.handleShowCitizenForm}>
-        Citizen Form
-        </Button>
+        <Card style={{ width: '18rem', margin: '15px'}}>
+          <Card.Body>
+            <Card.Title style={{ color: 'black'}}>Create Citizen</Card.Title>
+            <Card.Text style={{ color: 'black'}}>
+              This will allow you to create a Citizen who can vote in an Election.
+            </Card.Text>
+              <Button variant="primary" type="submit" onClick={props.handleShowCitizenForm}>
+              Citizen Form
+              </Button>
+            </Card.Body>
+          </Card>
         </>
       );
     }

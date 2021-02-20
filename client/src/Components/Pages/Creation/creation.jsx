@@ -16,6 +16,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 import Web3 from 'web3';
 
@@ -33,8 +34,9 @@ function Creation(props) {
   const handleCloseCitizenForm = () => {
     setShowCitizenForm(oldValue => !oldValue);
   }
-  const handleShowCitizenForm = () => {
-    setShowCitizenForm(oldValue => !oldValue);
+  const handleShowCitizenForm = async(name, dob, zipCode, stateId) => {
+    await setShowCitizenForm(oldValue => !oldValue);
+
   }
 
   const [showOfficeForm, setShowOfficeForm] = useState(false);
@@ -67,26 +69,30 @@ function Creation(props) {
       <header className="App-header">
         <h1>Creation</h1>
 
-        <CitizenForm
-          showCitizenForm={showCitizenForm}
-          handleShowCitizenForm={handleShowCitizenForm}
-          handleCloseCitizenForm={handleCloseCitizenForm}
-        />
-        <OfficeForm
-          showOfficeForm={showOfficeForm}
-          handleShowOfficeForm={handleShowOfficeForm}
-          handleCloseOfficeForm={handleCloseOfficeForm}
-        />
-        <ElectionForm
-          showElectionForm={showElectionForm}
-          handleShowElectionForm={handleShowElectionForm}
-          handleCloseElectionForm={handleCloseElectionForm}
-        />
-        <CandidateForm
-          showCandidateForm={showCandidateForm}
-          handleShowCandidateForm={handleShowCandidateForm}
-          handleCloseCandidateForm={handleCloseCandidateForm}
-        />
+        <Row>
+          <CitizenForm
+            showCitizenForm={showCitizenForm}
+            handleShowCitizenForm={handleShowCitizenForm}
+            handleCloseCitizenForm={handleCloseCitizenForm}
+          />
+          <OfficeForm
+            showOfficeForm={showOfficeForm}
+            handleShowOfficeForm={handleShowOfficeForm}
+            handleCloseOfficeForm={handleCloseOfficeForm}
+          />
+        </Row>
+        <Row>
+          <ElectionForm
+            showElectionForm={showElectionForm}
+            handleShowElectionForm={handleShowElectionForm}
+            handleCloseElectionForm={handleCloseElectionForm}
+          />
+          <CandidateForm
+            showCandidateForm={showCandidateForm}
+            handleShowCandidateForm={handleShowCandidateForm}
+            handleCloseCandidateForm={handleCloseCandidateForm}
+          />
+        </Row>
 
       </header>
 

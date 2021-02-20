@@ -132,12 +132,12 @@ contract OneVote is AccessControl{
     /*  //creates citizens that will be able to vote if citizens are included in a particular election
         //emits event once citizen is created
         //a citizen cannot have the same stateId as another citizen */
-    function _createCitizen(
+    function createCitizen(
             string memory _name,
             int64 _dateOfBirth,
             uint256 _zipCode,
             uint256 _stateId
-        ) internal returns (uint256){
+        ) public returns (uint256){
           require(stateIdInUse[_stateId] == false, "State ID is already assigned to a citizen");
           require(addressInUse[msg.sender] == false, "Address is already assigned to a citizen");
 
@@ -168,7 +168,7 @@ contract OneVote is AccessControl{
 
       /*  //gets citizen data
           //must be internal to prevent data being seen by unwanted users */
-      function _getCitizen(uint256 _citizenId)internal view returns(
+      function _getCitizen(uint256 _citizenId)public view returns(
             string memory _name,
             int64 _dateOfBirth,
             uint256 _zipCode,
