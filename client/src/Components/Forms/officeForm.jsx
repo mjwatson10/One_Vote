@@ -35,19 +35,19 @@ function OfficeForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeName">
                       <Form.Label>Office Name</Form.Label>
-                      <Form.Control type="text" name="officeName" placeholder="Enter Office Name" ref={register} />
+                      <Form.Control type="text" name="officeName" placeholder="Enter Office Name" ref={register} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridZip">
                       <Form.Label>Zip Code</Form.Label>
-                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register} />
+                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
                         <Form.Label>Minimum Age Required</Form.Label>
-                        <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" ref={register} />
+                        <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" ref={register} required />
                     </Form.Group>
                   </Form.Row>
               </Form>

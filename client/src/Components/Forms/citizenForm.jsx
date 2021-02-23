@@ -16,8 +16,11 @@ import Web3 from 'web3';
 
 function CitizenForm(props){
   const { register, handleSubmit, watch, errors } = useForm();
+  const { fullName, setFullName } = useState("");
+
 
   const onSubmit = (data) => {
+    // setFullName(oldValue => )
     console.log(data);
   }
 
@@ -37,18 +40,18 @@ function CitizenForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridFirstName">
                       <Form.Label>Full Name</Form.Label>
-                      <Form.Control type="text" name="fullName" placeholder="Enter Full Name" ref={register} />
+                      <Form.Control type="text" value={fullName} name="fullName" placeholder="Enter Full Name" ref={register} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
                         <Form.Label>Date Of Birth</Form.Label>
-                        <Form.Control type="date" name="dob" placeholder="Date of Birth" ref={register} />
+                        <Form.Control type="date" name="dob" placeholder="Date of Birth" ref={register} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Group as={Col} controlId="formGridStateId">
                       <Form.Label>State ID</Form.Label>
-                      <Form.Control type="number" name="stateId" placeholder="Generate State ID" ref={register} />
+                      <Form.Control type="number" name="stateId" placeholder="Generate State ID" ref={register} required />
                     </Form.Group>
 
                   <Button variant="primary" type="submit" id="generatorBTN">
@@ -58,7 +61,7 @@ function CitizenForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridZipCode">
                       <Form.Label>Zip Code</Form.Label>
-                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register}/>
+                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register} required />
                     </Form.Group>
                   </Form.Row>
           </Modal.Body>

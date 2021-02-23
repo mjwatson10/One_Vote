@@ -35,19 +35,19 @@ function ElectionForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeId">
                       <Form.Label>Office ID</Form.Label>
-                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} />
+                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridStartDate">
                         <Form.Label>Start Date of Election</Form.Label>
-                        <Form.Control type="date" name="start" placeholder="Start Date of Election" ref={register} />
+                        <Form.Control type="date" name="start" placeholder="Start Date of Election" ref={register} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridEndDate">
                         <Form.Label>End Date of Election</Form.Label>
-                        <Form.Control type="date" name="end" placeholder="End Date of Election" ref={register} />
+                        <Form.Control type="date" name="end" placeholder="End Date of Election" ref={register} required />
                     </Form.Group>
                   </Form.Row>
           </Modal.Body>

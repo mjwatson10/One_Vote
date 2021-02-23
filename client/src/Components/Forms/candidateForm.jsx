@@ -35,24 +35,24 @@ function CandidateForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridCitizenId">
                       <Form.Label>Citizen ID</Form.Label>
-                      <Form.Control type="number" name="CitizenId" placeholder="Enter Citizen ID" ref={register} />
+                      <Form.Control type="number" name="CitizenId" placeholder="Enter Citizen ID" ref={register} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridStateId">
                       <Form.Label>State ID</Form.Label>
-                      <Form.Control type="number" name="StateId" placeholder="Enter State ID" ref={register} />
+                      <Form.Control type="number" name="StateId" placeholder="Enter State ID" ref={register} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeId">
                       <Form.Label>Office ID</Form.Label>
-                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} />
+                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridElectionId">
                       <Form.Label>Election ID</Form.Label>
-                      <Form.Control type="number" name="ElectionId" placeholder="Enter Election ID" ref={register} />
+                      <Form.Control type="number" name="ElectionId" placeholder="Enter Election ID" ref={register} required />
                     </Form.Group>
                   </Form.Row>
           </Modal.Body>

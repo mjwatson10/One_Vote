@@ -34,9 +34,12 @@ function Creation(props) {
   const handleCloseCitizenForm = () => {
     setShowCitizenForm(oldValue => !oldValue);
   }
-  const handleShowCitizenForm = async(name, dob, zipCode, stateId) => {
+  const handleShowCitizenForm = async() => {
     await setShowCitizenForm(oldValue => !oldValue);
-
+    // await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: accounts[0]});
+    // const citizenEvent = props.contract.event.CitizenAdded().on('data', function(event){
+    //   console.log("Citizen Added: ", event.returnValues);
+    // });
   }
 
   const [showOfficeForm, setShowOfficeForm] = useState(false);
