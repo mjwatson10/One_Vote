@@ -6,14 +6,14 @@ import "./OneVote.sol";
 
 contract Test is OneVote{
 
-  function createCitizen(
+  /* function createCitizen(
     string memory _name,
     int64 _dateOfBirth,
     uint256 _zipCode,
     uint256 _stateId
     ) public returns (uint256){
       return _createCitizen(_name, _dateOfBirth, _zipCode, _stateId);
-    }
+    } */
 
 
   function getCitizen(uint256 _citizenId) public view returns(string memory name, int64 dateOfBirth, uint256 zipCode, bool citizenship){

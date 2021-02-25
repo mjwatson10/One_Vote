@@ -19,6 +19,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
 import Web3 from 'web3';
+import App from '../../../App.js';
 
 
 const Section = styled.section`
@@ -30,16 +31,24 @@ const Section = styled.section`
 
 
 function Creation(props) {
-  const [showCitizenForm, setShowCitizenForm] = useState(false);
-  const handleCloseCitizenForm = () => {
-    setShowCitizenForm(oldValue => !oldValue);
+  const dateNeeded = (date) => {
+    let ageInMilliseconds = Date.parse(date) / 1000;
+
+    return ageInMilliseconds;
   }
-  const handleShowCitizenForm = async() => {
-    await setShowCitizenForm(oldValue => !oldValue);
-    // await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: accounts[0]});
-    // const citizenEvent = props.contract.event.CitizenAdded().on('data', function(event){
+
+  const [showCitizenForm, setShowCitizenForm] = useState(false);
+  const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
+    setShowCitizenForm(oldValue => !oldValue);
+    // await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: props.user});
+    // await props.contract.event.CitizenAdded().on('data', function(event){
     //   console.log("Citizen Added: ", event.returnValues);
     // });
+    console.log("Methods: ", props.contract);
+    console.log("Accounts: ", props.accounts);
+}
+  const handleShowCitizenForm = () => {
+    setShowCitizenForm(oldValue => !oldValue);
   }
 
   const [showOfficeForm, setShowOfficeForm] = useState(false);
@@ -77,11 +86,13 @@ function Creation(props) {
             showCitizenForm={showCitizenForm}
             handleShowCitizenForm={handleShowCitizenForm}
             handleCloseCitizenForm={handleCloseCitizenForm}
+            dateNeeded={dateNeeded}
           />
           <OfficeForm
             showOfficeForm={showOfficeForm}
             handleShowOfficeForm={handleShowOfficeForm}
             handleCloseOfficeForm={handleCloseOfficeForm}
+            dateNeeded={dateNeeded}
           />
         </Row>
         <Row>
@@ -89,11 +100,13 @@ function Creation(props) {
             showElectionForm={showElectionForm}
             handleShowElectionForm={handleShowElectionForm}
             handleCloseElectionForm={handleCloseElectionForm}
+            dateNeeded={dateNeeded}
           />
           <CandidateForm
             showCandidateForm={showCandidateForm}
             handleShowCandidateForm={handleShowCandidateForm}
             handleCloseCandidateForm={handleCloseCandidateForm}
+            dateNeeded={dateNeeded}
           />
         </Row>
 
