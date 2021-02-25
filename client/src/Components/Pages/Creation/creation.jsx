@@ -7,6 +7,7 @@ import CitizenForm from '../../Forms/citizenForm.jsx';
 import OfficeForm from '../../Forms/officeForm.jsx';
 import ElectionForm from '../../Forms/electionForm.jsx';
 import CandidateForm from '../../Forms/candidateForm.jsx';
+import App from '../../../App.js';
 
 import axios from 'axios';
 import styled from 'styled-components';
@@ -19,7 +20,6 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
 import Web3 from 'web3';
-import App from '../../../App.js';
 
 
 const Section = styled.section`
@@ -31,19 +31,22 @@ const Section = styled.section`
 
 
 function Creation(props) {
+  //converts dates to readable numbers for solidity
   const dateNeeded = (date) => {
     let ageInMilliseconds = Date.parse(date) / 1000;
 
     return ageInMilliseconds;
   }
 
+  //modal functions
+  //citizens
   const [showCitizenForm, setShowCitizenForm] = useState(false);
   const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
     setShowCitizenForm(oldValue => !oldValue);
-    // await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: props.user});
-    // await props.contract.event.CitizenAdded().on('data', function(event){
-    //   console.log("Citizen Added: ", event.returnValues);
-    // });
+    await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: props.user});
+    await props.contract.event.CitizenAdded().on('data', function(event){
+      console.log("Citizen Added: ", event.returnValues);
+    });
     console.log("Methods: ", props.contract);
     console.log("Accounts: ", props.accounts);
 }
@@ -51,6 +54,7 @@ function Creation(props) {
     setShowCitizenForm(oldValue => !oldValue);
   }
 
+  //offices
   const [showOfficeForm, setShowOfficeForm] = useState(false);
   const handleCloseOfficeForm = () => {
     setShowOfficeForm(oldValue => !oldValue);
@@ -59,6 +63,7 @@ function Creation(props) {
     setShowOfficeForm(oldValue => !oldValue);
   }
 
+  //elections
   const [showElectionForm, setShowElectionForm] = useState(false);
   const handleCloseElectionForm = () => {
     setShowElectionForm(oldValue => !oldValue);
@@ -67,6 +72,7 @@ function Creation(props) {
     setShowElectionForm(oldValue => !oldValue);
   }
 
+  //candidates
   const [showCandidateForm, setShowCandidateForm] = useState(false);
   const handleCloseCandidateForm = () => {
     setShowCandidateForm(oldValue => !oldValue);

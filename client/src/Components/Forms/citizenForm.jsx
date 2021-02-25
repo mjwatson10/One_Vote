@@ -35,7 +35,7 @@ const handleSubmit = async(e) => {
     e.preventDefault();
     const birthDate = props.dateNeeded(values.dob);
 
-    props.handleCloseCitizenForm(values.name, values.dob, values.stateId, values.zipCode);
+    props.handleCloseCitizenForm(values.fullName, birthDate, values.stateId, values.zipCode);
 }
 
       return (
@@ -45,51 +45,51 @@ const handleSubmit = async(e) => {
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-        <Form>
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
-          </Modal.Header>
+          <Form>
+              <Modal.Header closeButton>
+                <Modal.Title>Modal heading</Modal.Title>
+              </Modal.Header>
 
-          <Modal.Body>
-                  <Form.Row>
-                    <Form.Group as={Col} controlId="formGridFirstName">
-                      <Form.Label>Full Name</Form.Label>
-                      <Form.Control type="text" onChange={handleInputChange} name="fullName" placeholder="Enter Full Name" required />
-                    </Form.Group>
+              <Modal.Body>
+                      <Form.Row>
+                        <Form.Group as={Col} controlId="formGridFirstName">
+                          <Form.Label>Full Name</Form.Label>
+                          <Form.Control type="text" onChange={handleInputChange} name="fullName" placeholder="Enter Full Name" required />
+                        </Form.Group>
 
-                    <Form.Group as={Col} controlId="formGridDOB">
-                        <Form.Label>Date Of Birth</Form.Label>
-                        <Form.Control type="date" name="dob" onChange={handleInputChange} placeholder="Date of Birth" required />
-                    </Form.Group>
-                  </Form.Row>
+                        <Form.Group as={Col} controlId="formGridDOB">
+                            <Form.Label>Date Of Birth</Form.Label>
+                            <Form.Control type="date" name="dob" onChange={handleInputChange} placeholder="Date of Birth" required />
+                        </Form.Group>
+                      </Form.Row>
 
-                  <Form.Group as={Col} controlId="formGridStateId">
-                      <Form.Label>State ID</Form.Label>
-                      <Form.Control type="number" name="stateId" onChange={handleInputChange} placeholder="Generate State ID" required />
-                    </Form.Group>
+                      <Form.Group as={Col} controlId="formGridStateId">
+                          <Form.Label>State ID</Form.Label>
+                          <Form.Control type="number" name="stateId" onChange={handleInputChange} placeholder="Generate State ID" required />
+                        </Form.Group>
 
-                  <Button variant="primary" type="submit" id="generatorBTN">
-                  Generate State ID
-                  </Button>
+                      <Button variant="primary" type="submit" id="generatorBTN">
+                      Generate State ID
+                      </Button>
 
-                  <Form.Row>
-                    <Form.Group as={Col} controlId="formGridZipCode">
-                      <Form.Label>Zip Code</Form.Label>
-                      <Form.Control type="number" name="zipCode" onChange={handleInputChange} placeholder="Enter Zip Code" required />
-                    </Form.Group>
-                  </Form.Row>
-          </Modal.Body>
+                      <Form.Row>
+                        <Form.Group as={Col} controlId="formGridZipCode">
+                          <Form.Label>Zip Code</Form.Label>
+                          <Form.Control type="number" name="zipCode" onChange={handleInputChange} placeholder="Enter Zip Code" required />
+                        </Form.Group>
+                      </Form.Row>
+              </Modal.Body>
 
-          <Modal.Footer>
-            <Button variant="primary" type="submit" onClick={handleSubmit}>
-            Submit
-            </Button>
+              <Modal.Footer>
+                <Button variant="primary" type="submit" onClick={handleSubmit}>
+                Submit
+                </Button>
 
-            <Button variant="secondary" onClick={props.handleCloseCitizenForm}>
-              Close
-            </Button>
-          </Modal.Footer>
-          </Form>
+                <Button variant="secondary" onClick={props.handleCloseCitizenForm}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Form>
         </Modal>
 
         <Card style={{ width: '18rem', margin: '15px'}}>

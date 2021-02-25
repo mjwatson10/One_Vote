@@ -28,6 +28,7 @@ function App(props) {
 
 
 const handleInputChange = (e) => {
+  //test
   setValues({
             ...values,
             [e.target.name]: e.target.value.trim()
@@ -56,6 +57,8 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
     console.log("Citizen Added: ", event.returnValues);
   });
 }
+
+//test end
 
 
 
@@ -129,14 +132,19 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
         <Switch>
           <Route exact strict path="/" component={HomePage} />
           <Route exact strict path="/Home" component={HomePage} />
-          <Route exact strict path="/Creation" component={Creation}
-            contract={contract}
-            accounts={accounts}
+          <Route exact strict path="/Creation" render={(routeProps) =>
+              <Creation
+                accounts={accounts}
+                contract={contract}
+                user={user}
+                {...routeProps}
+                />
+             }
           />
         </Switch>
       </BrowserRouter>
 
-
+      <h1>Test</h1>
           <Button variant="primary" type="submit" onClick={handleSubmit}>Submit</Button>
           <Form.Row>
             <Form.Group as={Col} controlId="formGridFirstName">
