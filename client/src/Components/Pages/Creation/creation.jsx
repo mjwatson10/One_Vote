@@ -41,45 +41,75 @@ function Creation(props) {
   //modal functions
   //citizens
   const [showCitizenForm, setShowCitizenForm] = useState(false);
-  const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
+    //handles contract call
+  const handleSubmitCitizenForm = async(name, dob, zipCode, stateId) => {
     setShowCitizenForm(oldValue => !oldValue);
     await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: props.user});
-    await props.contract.event.CitizenAdded().on('data', function(event){
+    await props.contract.event.CitizenAdded().on('data', (event) => {
       console.log("Citizen Added: ", event.returnValues);
     });
-    console.log("Methods: ", props.contract);
-    console.log("Accounts: ", props.accounts);
 }
   const handleShowCitizenForm = () => {
     setShowCitizenForm(oldValue => !oldValue);
   }
+  const handleCloseCitizenForm = () => {
+    setShowCitizenForm(oldValue => !oldValue);
+  }
+
 
   //offices
   const [showOfficeForm, setShowOfficeForm] = useState(false);
-  const handleCloseOfficeForm = () => {
+    //handles contract call
+  const handleSubmitOfficeForm = async(officeTitle, zipCode, requiredAge) => {
     setShowOfficeForm(oldValue => !oldValue);
+    await props.contract.methods.createOffice(officeTitle, zipCode, requiredAge).send({from: props.user});
+    await props.contract.event.OfficeAdded().on('data', (event) => {
+      console.log("Office Added: ", event.returnValues);
+    });
   }
   const handleShowOfficeForm = () => {
     setShowOfficeForm(oldValue => !oldValue);
   }
+  const handleCloseOfficeForm = () => {
+    setShowOfficeForm(oldValue => !oldValue);
+  }
+
 
   //elections
   const [showElectionForm, setShowElectionForm] = useState(false);
-  const handleCloseElectionForm = () => {
+    //handles contract call
+  const handleSubmitElectionForm = async(officeId, start, end) => {
     setShowElectionForm(oldValue => !oldValue);
+    await props.contract.methods.createAnElection(officeId, start, end).send({from: props.user});
+    await props.contract.methods.ElectionAdded().on('data', (event) => {
+      console.log("Election Added: ", event.returnValues);
+    });
   }
   const handleShowElectionForm = () => {
     setShowElectionForm(oldValue => !oldValue);
   }
+  const handleCloseElectionForm = () => {
+    setShowElectionForm(oldValue => !oldValue);
+  }
+
 
   //candidates
   const [showCandidateForm, setShowCandidateForm] = useState(false);
-  const handleCloseCandidateForm = () => {
+    //handles contract call
+  const handleSubmitCandidateForm = async(citizenId, stateId, officeId, electionId) => {
     setShowCandidateForm(oldValue => !oldValue);
+    await props.contract.methods.createCandidate(citizenId, stateId, officeId, electionId).send({from: props.user});
+    await props.contract.methids.CandidateAdded().on('data', (event) => {
+      console.log("Candidate Added: ", event.returnValues);
+    });
   }
   const handleShowCandidateForm = () => {
     setShowCandidateForm(oldValue => !oldValue);
   }
+  const handleCloseCandidateForm = () => {
+    setShowCandidateForm(oldValue => !oldValue);
+  }
+
 
   return(
     <div className="App">

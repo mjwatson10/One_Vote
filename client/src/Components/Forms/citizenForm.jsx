@@ -35,7 +35,7 @@ const handleSubmit = async(e) => {
     e.preventDefault();
     const birthDate = props.dateNeeded(values.dob);
 
-    props.handleCloseCitizenForm(values.fullName, birthDate, values.stateId, values.zipCode);
+    props.handleSubmitCitizenForm(values.fullName, birthDate, values.stateId, values.zipCode);
 }
 
       return (
@@ -54,18 +54,18 @@ const handleSubmit = async(e) => {
                       <Form.Row>
                         <Form.Group as={Col} controlId="formGridFirstName">
                           <Form.Label>Full Name</Form.Label>
-                          <Form.Control type="text" onChange={handleInputChange} name="fullName" placeholder="Enter Full Name" required />
+                          <Form.Control type="text" name="fullName" placeholder="Enter Full Name"  onChange={handleInputChange} required />
                         </Form.Group>
 
                         <Form.Group as={Col} controlId="formGridDOB">
                             <Form.Label>Date Of Birth</Form.Label>
-                            <Form.Control type="date" name="dob" onChange={handleInputChange} placeholder="Date of Birth" required />
+                            <Form.Control type="date" name="dob" placeholder="Date of Birth" onChange={handleInputChange} required />
                         </Form.Group>
                       </Form.Row>
 
                       <Form.Group as={Col} controlId="formGridStateId">
                           <Form.Label>State ID</Form.Label>
-                          <Form.Control type="number" name="stateId" onChange={handleInputChange} placeholder="Generate State ID" required />
+                          <Form.Control type="number" name="stateId" placeholder="Generate State ID" onChange={handleInputChange} required />
                         </Form.Group>
 
                       <Button variant="primary" type="submit" id="generatorBTN">
@@ -75,7 +75,7 @@ const handleSubmit = async(e) => {
                       <Form.Row>
                         <Form.Group as={Col} controlId="formGridZipCode">
                           <Form.Label>Zip Code</Form.Label>
-                          <Form.Control type="number" name="zipCode" onChange={handleInputChange} placeholder="Enter Zip Code" required />
+                          <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" onChange={handleInputChange} required />
                         </Form.Group>
                       </Form.Row>
               </Modal.Body>
@@ -91,6 +91,7 @@ const handleSubmit = async(e) => {
               </Modal.Footer>
             </Form>
         </Modal>
+        
 
         <Card style={{ width: '18rem', margin: '15px'}}>
           <Card.Body>

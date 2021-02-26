@@ -13,10 +13,26 @@ import Card from 'react-bootstrap/Card';
 
 
 function CandidateForm(props){
-  const { register, handleSubmit, watch, errors } = useForm();
+  const [ values, setValues ] = useState({
+    citizenId: 0,
+    stateId: 0,
+    officeId: 0,
+    electionId: 0
+  });
 
-  const onSubmit = (data) => {
-    console.log(data);
+
+  const handleInputChange = (e) => {
+    setValues({
+              ...values,
+              [e.target.name]: e.target.value.trim()
+            });
+  }
+
+
+  const handleSubmit = async(e) => {
+      e.preventDefault();
+
+      props.handleSubmitCandidateForm(values.citizenId, values.stateId, values.officeId, values.electionId);
   }
 
       return (
@@ -26,7 +42,7 @@ function CandidateForm(props){
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form>
           <Modal.Header closeButton>
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
@@ -35,30 +51,30 @@ function CandidateForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridCitizenId">
                       <Form.Label>Citizen ID</Form.Label>
-                      <Form.Control type="number" name="CitizenId" placeholder="Enter Citizen ID" ref={register} required />
+                      <Form.Control type="number" name="citizenId" placeholder="Enter Citizen ID" onChange={handleInputChange} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridStateId">
                       <Form.Label>State ID</Form.Label>
-                      <Form.Control type="number" name="StateId" placeholder="Enter State ID" ref={register} required />
+                      <Form.Control type="number" name="stateId" placeholder="Enter State ID" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeId">
                       <Form.Label>Office ID</Form.Label>
-                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} required />
+                      <Form.Control type="number" name="officeId" placeholder="Enter Office ID" onChange={handleInputChange} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridElectionId">
                       <Form.Label>Election ID</Form.Label>
-                      <Form.Control type="number" name="ElectionId" placeholder="Enter Election ID" ref={register} required />
+                      <Form.Control type="number" name="electionId" placeholder="Enter Election ID" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button variant="primary" type="submit" onClick={props.handleCloseCandidateForm}>
+            <Button variant="primary" type="submit" onClick={handleSubmit}>
             Submit
             </Button>
 
@@ -68,6 +84,7 @@ function CandidateForm(props){
           </Modal.Footer>
           </Form>
         </Modal>
+
 
         <Card style={{ width: '18rem', margin: '15px'}}>
           <Card.Body>

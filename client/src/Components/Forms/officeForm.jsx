@@ -12,12 +12,28 @@ import Card from 'react-bootstrap/Card';
 
 
 function OfficeForm(props){
-  const { register, handleSubmit, watch, errors } = useForm();
+  const [ values, setValues ] = useState({
+    officeName: "",
+    zipCode: 0,
+    minimumBirthDate: ""
+  });
 
-  const onSubmit = (data) => {
-    console.log(data);
+
+  const handleInputChange = (e) => {
+    setValues({
+              ...values,
+              [e.target.name]: e.target.value.trim()
+            });
   }
 
+
+  const handleSubmit = async(e) => {
+      e.preventDefault();
+
+      const minimum = props.dateNeeded(values.minimumBirthDate);
+
+      props.handleSubmitOfficeForm(values.officeName, values.zipCode, minimum);
+  }
       return (
         <>
         <Modal show={props.showOfficeForm} onHide={props.handleCloseOfficeForm}
@@ -25,7 +41,7 @@ function OfficeForm(props){
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form>
           <Modal.Header closeButton>
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
@@ -35,26 +51,26 @@ function OfficeForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeName">
                       <Form.Label>Office Name</Form.Label>
-                      <Form.Control type="text" name="officeName" placeholder="Enter Office Name" ref={register} required />
+                      <Form.Control type="text" name="officeName" placeholder="Enter Office Name" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridZip">
                       <Form.Label>Zip Code</Form.Label>
-                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" ref={register} required />
+                      <Form.Control type="number" name="zipCode" placeholder="Enter Zip Code" onChange={handleInputChange} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridDOB">
                         <Form.Label>Minimum Age Required</Form.Label>
-                        <Form.Control type="date" name="dob" placeholder="Date of Birth for Age Requirement" ref={register} required />
+                        <Form.Control type="date" name="minimumBirthDate" placeholder="Date of Birth for Age Requirement" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
               </Form>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button variant="primary" type="submit" onClick={props.handleCloseOfficeForm}>
+            <Button variant="primary" type="submit" onClick={handleSubmit}>
             Submit
             </Button>
 

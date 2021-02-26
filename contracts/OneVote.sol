@@ -82,12 +82,19 @@ contract OneVote is AccessControl{
         uint256[] candidateIds;
     }
 
+    struct ElectionsInZip {
+      uint256[] electionIds;
+
+    }
+
 
 //ARRAYS
     Citizen[] citizens;
     Candidate[] candidates;
     Office[] offices;
     Election[] elections;
+    ElectionsInZip[] electionsInZips;
+
 
     //citizen mapping
     /// @dev citizen mapping needs to be private after testing
@@ -108,6 +115,8 @@ contract OneVote is AccessControl{
     //election mapping
     /* mapping(uint256 => Election) public electionIdToElection; */
     /* mapping(uint256 => bool) public electionIsActive; */
+    mapping(uint256 => electionsInZips) public allElectionIdsInZip;
+    mapping(uint256 => bool) public electionIsPending;
 
 
 //CONSTRUCTOR
@@ -119,6 +128,7 @@ contract OneVote is AccessControl{
       citizens.push();
       offices.push();
       candidates.push();
+      electionsInZips.push();
     }
 
 
@@ -342,6 +352,8 @@ contract OneVote is AccessControl{
 
         require(officeIsUpForElection[candidate.officeId] == true, "This position was not up for election");
 
+        electionIsPending[_electionId] = false;
+
         officeIsUpForElection[candidate.officeId] = false;
       }
 
@@ -368,15 +380,31 @@ contract OneVote is AccessControl{
                 election.electionEnd = _end;
                 election.electionId = elections.length;
 
-
             /* elections.push(_election); */
             uint256 newElectionId = elections.length - 1;
+
+            _addToMappingZip(office.zipCode, newElectionId);
+            electionIsPending[newElectionId] = true;
 
             /* electionIdToElection[newElectionId] = _election; */
 
             emit ElectionAdded(office.officeTitle, office.zipCode, _start, _end, newElectionId);
 
         return newElectionId;
+      }
+
+
+      function _addToMappingZip(_zipCode, _newElectionId) internal {
+        if(allElectionIdsInZip[_zipCode] = 0){
+          electionsInZips.push();
+
+          ElectionsInZip storage electionsInZip = electionsInZips[electionsInZips.length - 1];
+              electionsInZip.electionIds = _newElectionId;
+
+          allElectionIdsInZip[_zipCode] = electionsInZips[_newElectionId];
+        } else {
+
+        }
       }
 
 
@@ -396,6 +424,11 @@ contract OneVote is AccessControl{
           electionStart = election.electionStart;
           electionEnd = election.electionEnd;
           candidateIds = election.candidateIds;
+        }
+
+
+        function getAllElectionsInZip(uint256 _zipCode) public view returns(uint256[] memory electionIds){
+
         }
 
 
@@ -472,6 +505,7 @@ contract OneVote is AccessControl{
             highestVoteCount = candidate.voteCount;
           }
         }
+
         return highestVoteCount;
       }
 

@@ -13,10 +13,28 @@ import Card from 'react-bootstrap/Card';
 
 
 function ElectionForm(props){
-  const { register, handleSubmit, watch, errors } = useForm();
+  const [ values, setValues ] = useState({
+    officeId: 0,
+    start: "",
+    end: ""
+  });
 
-  const onSubmit = (data) => {
-    console.log(data);
+
+  const handleInputChange = (e) => {
+    setValues({
+              ...values,
+              [e.target.name]: e.target.value.trim()
+            });
+  }
+
+
+  const handleSubmit = async(e) => {
+      e.preventDefault();
+
+      const startDate = props.dateNeeded(values.start);
+      const endDate = props.dateNeeded(values.end);
+
+      props.handleSubmitElectionForm(values.officeId, startDate, endDate);
   }
 
       return (
@@ -26,7 +44,7 @@ function ElectionForm(props){
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form>
           <Modal.Header closeButton>
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
@@ -35,25 +53,25 @@ function ElectionForm(props){
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridOfficeId">
                       <Form.Label>Office ID</Form.Label>
-                      <Form.Control type="number" name="OfficeId" placeholder="Enter Office ID" ref={register} required />
+                      <Form.Control type="number" name="officeId" placeholder="Enter Office ID" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
 
                   <Form.Row>
                     <Form.Group as={Col} controlId="formGridStartDate">
                         <Form.Label>Start Date of Election</Form.Label>
-                        <Form.Control type="date" name="start" placeholder="Start Date of Election" ref={register} required />
+                        <Form.Control type="date" name="start" placeholder="Start Date of Election" onChange={handleInputChange} required />
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridEndDate">
                         <Form.Label>End Date of Election</Form.Label>
-                        <Form.Control type="date" name="end" placeholder="End Date of Election" ref={register} required />
+                        <Form.Control type="date" name="end" placeholder="End Date of Election" onChange={handleInputChange} required />
                     </Form.Group>
                   </Form.Row>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button variant="primary" type="submit" onClick={props.handleCloseElectionForm}>
+            <Button variant="primary" type="submit" onClick={handleSubmit}>
             Submit
             </Button>
 
@@ -63,6 +81,7 @@ function ElectionForm(props){
           </Modal.Footer>
           </Form>
       </Modal>
+
 
       <Card style={{ width: '18rem', margin: '15px'}}>
         <Card.Body>
