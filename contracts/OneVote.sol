@@ -84,7 +84,6 @@ contract OneVote is AccessControl{
 
     struct ElectionsInZip {
       uint256[] electionIds;
-
     }
 
 
@@ -399,11 +398,13 @@ contract OneVote is AccessControl{
           electionsInZips.push();
 
           ElectionsInZip storage electionsInZip = electionsInZips[electionsInZips.length - 1];
-              electionsInZip.electionIds = _newElectionId;
+              electionsInZip.electionIds.push(_newElectionId);
 
-          allElectionIdsInZip[_zipCode] = electionsInZips[_newElectionId];
+          allElectionIdsInZip[_zipCode] = electionsInZip;
         } else {
+          uint256[] memory existingArray = allElectionIdsInZip[_zipCode];
 
+          existingArray.push(_newElectionId);
         }
       }
 
@@ -428,7 +429,14 @@ contract OneVote is AccessControl{
 
 
         function getAllElectionsInZip(uint256 _zipCode) public view returns(uint256[] memory electionIds){
+          uint256[] electionIdsArray = allElectionIdsInZip[_zipCode];
 
+          return electionIdsArray;
+        }
+
+
+        function isPending(_electionId) public view returns(bool){
+          return electionIsPending[_electionId];
         }
 
 
