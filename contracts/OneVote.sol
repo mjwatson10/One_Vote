@@ -114,7 +114,7 @@ contract OneVote is AccessControl{
     //election mapping
     /* mapping(uint256 => Election) public electionIdToElection; */
     /* mapping(uint256 => bool) public electionIsActive; */
-    mapping(uint256 => electionsInZips) public allElectionIdsInZip;
+    mapping(uint256 => ElectionsInZip) public allElectionIdsInZip;
     mapping(uint256 => bool) public electionIsPending;
 
 
@@ -351,7 +351,7 @@ contract OneVote is AccessControl{
 
         require(officeIsUpForElection[candidate.officeId] == true, "This position was not up for election");
 
-        electionIsPending[_electionId] = false;
+        electionIsPending[candidate.electionId] = false;
 
         officeIsUpForElection[candidate.officeId] = false;
       }
@@ -393,8 +393,8 @@ contract OneVote is AccessControl{
       }
 
 
-      function _addToMappingZip(_zipCode, _newElectionId) internal {
-        if(allElectionIdsInZip[_zipCode] = 0){
+      function _addToMappingZip(uint256 _zipCode, uint256 _newElectionId) internal {
+        if(allElectionIdsInZip[_zipCode] == 0){
           electionsInZips.push();
 
           ElectionsInZip storage electionsInZip = electionsInZips[electionsInZips.length - 1];
@@ -402,9 +402,7 @@ contract OneVote is AccessControl{
 
           allElectionIdsInZip[_zipCode] = electionsInZip;
         } else {
-          uint256[] memory existingArray = allElectionIdsInZip[_zipCode];
-
-          existingArray.push(_newElectionId);
+          allElectionIdsInZip[_zipCode].push(_newElectionId);
         }
       }
 
@@ -429,13 +427,13 @@ contract OneVote is AccessControl{
 
 
         function getAllElectionsInZip(uint256 _zipCode) public view returns(uint256[] memory electionIds){
-          uint256[] electionIdsArray = allElectionIdsInZip[_zipCode];
+          uint256[] memory electionIdsArray = allElectionIdsInZip[_zipCode];
 
           return electionIdsArray;
         }
 
 
-        function isPending(_electionId) public view returns(bool){
+        function isPending(uint256 _electionId) public view returns(bool){
           return electionIsPending[_electionId];
         }
 
