@@ -84,6 +84,7 @@ contract OneVote is AccessControl{
 
     struct ElectionsInZip {
       uint256[] electionIds;
+      bool electionIsPending;
     }
 
 
@@ -394,11 +395,12 @@ contract OneVote is AccessControl{
 
 
       function _addToMappingZip(uint256 _zipCode, uint256 _newElectionId) internal {
-        if(allElectionIdsInZip[_zipCode] == 0){
+        if(allElectionIdsInZip[_zipCode].electionIsPending != true){
           electionsInZips.push();
 
           ElectionsInZip storage electionsInZip = electionsInZips[electionsInZips.length - 1];
               electionsInZip.electionIds.push(_newElectionId);
+              electionsInZip
 
           allElectionIdsInZip[_zipCode] = electionsInZip;
         } else {

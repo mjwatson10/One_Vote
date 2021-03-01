@@ -113,7 +113,7 @@ function Creation(props) {
 
   return(
     <div className="App">
-      <Navigation />
+      <collapseBreakPointCssMap />
       <header className="App-header">
         <h1>Creation</h1>
 

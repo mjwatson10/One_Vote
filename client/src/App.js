@@ -2,9 +2,13 @@ import React, {useState, useEffect} from 'react';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import HomePage from './Components/Pages/HomePage/homePage.jsx';
 import Creation from './Components/Pages/Creation/creation.jsx';
+import Elections from './Components/Pages/Elections/elections.jsx';
+import Results from './Components/Pages/Results/results.jsx';
 import getWeb3 from "./Components/Web3/getWeb3";
 // import Web3Context from "./Components/Web3/web3context.jsx";
 import OneVote from "./artifacts/OneVote.json";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import logo from './logo.svg';
 import './App.css';
@@ -141,6 +145,8 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
                 />
              }
           />
+          <Route exact strict path="/Elections" component={Elections} />
+          <Route exact strict path="/Results" component={Results} />
         </Switch>
       </BrowserRouter>
 

@@ -6,8 +6,6 @@ import reportWebVitals from './reportWebVitals';
 import useGlobalState from './store/useGlobalState.js';
 import Context from './store/context.js';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 const Index = () => {
   const store = useGlobalState();
   return (

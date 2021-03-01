@@ -13,11 +13,12 @@ function Navigation(props){
   return(
     <>
         <Navbar bg="primary" variant="dark">
-          <Navbar.Brand href="/Home">Navbar</Navbar.Brand>
+          <Navbar.Brand href="/Home">One Vote</Navbar.Brand>
           <Nav className="mr-auto">
             <Nav.Link href="/Home">Home</Nav.Link>
             <Nav.Link href="/Creation">Creation</Nav.Link>
-            <Nav.Link href="#pricing">Pricing</Nav.Link>
+            <Nav.Link href="/Elections">Elections</Nav.Link>
+            <Nav.Link href="/Results">Results</Nav.Link>
           </Nav>
           <Form inline>
             <FormControl type="text" placeholder="Search" className="mr-sm-2" />
