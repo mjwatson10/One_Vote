@@ -4,7 +4,7 @@ import HomePage from './Components/Pages/HomePage/homePage.jsx';
 import Creation from './Components/Pages/Creation/creation.jsx';
 import Elections from './Components/Pages/Elections/elections.jsx';
 import Results from './Components/Pages/Results/results.jsx';
-import getWeb3 from "./Components/Web3/getWeb3";
+import getWeb3 from './Components/Web3/getWeb3';
 // import Web3Context from "./Components/Web3/web3context.jsx";
 import OneVote from "./artifacts/OneVote.json";
 
@@ -149,36 +149,6 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
           <Route exact strict path="/Results" component={Results} />
         </Switch>
       </BrowserRouter>
-
-      <h1>Test</h1>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>Submit</Button>
-          <Form.Row>
-            <Form.Group as={Col} controlId="formGridFirstName">
-              <Form.Label>Full Name</Form.Label>
-              <Form.Control type="text" name="fullName" onChange={handleInputChange} placeholder="Enter Full Name" required />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId="formGridDOB">
-                <Form.Label>Date Of Birth</Form.Label>
-                <Form.Control type="date" name="dob" onChange={handleInputChange} placeholder="Date of Birth" required />
-            </Form.Group>
-          </Form.Row>
-
-          <Form.Group as={Col} controlId="formGridStateId">
-              <Form.Label>State ID</Form.Label>
-              <Form.Control type="number" name="stateId" onChange={handleInputChange} placeholder="Generate State ID" required />
-            </Form.Group>
-
-          <Button variant="primary" type="submit" id="generatorBTN">
-          Generate State ID
-          </Button>
-
-          <Form.Row>
-            <Form.Group as={Col} controlId="formGridZipCode">
-              <Form.Label>Zip Code</Form.Label>
-              <Form.Control type="number" name="zipCode" onChange={handleInputChange} placeholder="Enter Zip Code" required />
-            </Form.Group>
-          </Form.Row>
     </>
   )
 }

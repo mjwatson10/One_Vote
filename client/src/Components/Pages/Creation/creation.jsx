@@ -113,7 +113,7 @@ function Creation(props) {
 
   return(
     <div className="App">
-      <collapseBreakPointCssMap />
+      <Navigation />
       <header className="App-header">
         <h1>Creation</h1>
 
@@ -123,12 +123,14 @@ function Creation(props) {
             handleShowCitizenForm={handleShowCitizenForm}
             handleCloseCitizenForm={handleCloseCitizenForm}
             dateNeeded={dateNeeded}
+            handleSubmitCitizenForm={handleSubmitCitizenForm}
           />
           <OfficeForm
             showOfficeForm={showOfficeForm}
             handleShowOfficeForm={handleShowOfficeForm}
             handleCloseOfficeForm={handleCloseOfficeForm}
             dateNeeded={dateNeeded}
+            handleSubmitOfficeForm={handleSubmitOfficeForm}
           />
         </Row>
         <Row>
@@ -137,12 +139,14 @@ function Creation(props) {
             handleShowElectionForm={handleShowElectionForm}
             handleCloseElectionForm={handleCloseElectionForm}
             dateNeeded={dateNeeded}
+            handleSubmitElectionForm={handleSubmitElectionForm}
           />
           <CandidateForm
             showCandidateForm={showCandidateForm}
             handleShowCandidateForm={handleShowCandidateForm}
             handleCloseCandidateForm={handleCloseCandidateForm}
             dateNeeded={dateNeeded}
+            handleSubmitCandidateForm={handleSubmitCandidateForm}
           />
         </Row>
 

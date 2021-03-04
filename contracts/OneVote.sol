@@ -400,11 +400,11 @@ contract OneVote is AccessControl{
 
           ElectionsInZip storage electionsInZip = electionsInZips[electionsInZips.length - 1];
               electionsInZip.electionIds.push(_newElectionId);
-              electionsInZip
+              electionsInZip.electionIsPending = true;
 
           allElectionIdsInZip[_zipCode] = electionsInZip;
         } else {
-          allElectionIdsInZip[_zipCode].push(_newElectionId);
+           allElectionIdsInZip[_zipCode].electionIds.push(_newElectionId);
         }
       }
 
@@ -429,9 +429,7 @@ contract OneVote is AccessControl{
 
 
         function getAllElectionsInZip(uint256 _zipCode) public view returns(uint256[] memory electionIds){
-          uint256[] memory electionIdsArray = allElectionIdsInZip[_zipCode];
-
-          return electionIdsArray;
+          return allElectionIdsInZip[_zipCode].electionIds;
         }
 
 
