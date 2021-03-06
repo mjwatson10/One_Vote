@@ -15,6 +15,8 @@ import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Card from 'react-bootstrap/Card';
 
+import Web3 from 'web3';
+
 
   const CardSection = styled.section`
       width: 600px;
@@ -34,66 +36,79 @@ import Card from 'react-bootstrap/Card';
 
 
 function YourLocalElections(props){
-  //used to determine what elections the user can vote in
-  const [ values, setValues ] = useState({
-    zipCode: 0
-  });
 
-  const handleInputChange = (e) => {
-    setValues({
-                ...values,
-                [e.target.name]: e.target.value.trim()
-              });
+  const buttonText = props.showCurrentElections ?
+      <Button variant="primary" type="submit" onClick={props.handleClearCurrentElections}>Reset Zip Code</Button>
+      : <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>;
+
+  let content = [];
+  //determines and display the amount of elections and election data for a citizen to vote
+  const electionCards = async(show, zipCode) => {
+    if (show) {
+      try {
+        //contract call from function on election.jsx to get all electionIds
+        const allIds = await props.electionsInZip(zipCode)
+
+        for (var i = 0; i < allIds; i++) {
+          content.push(
+                        <CardSection key={i}>
+                          <Card>
+                            <Card.Header>Featured</Card.Header>
+                            <Card.Body>
+                              <Card.Title>Special title treatment</Card.Title>
+                              <Card.Text>
+                                With supporting text below as a natural lead-in to additional content.
+                              </Card.Text>
+                              <BtnSection>
+                                <Button variant="primary">Go somewhere</Button>
+                                <Button variant="primary">Go somewhere</Button>
+                              </BtnSection>
+                            </Card.Body>
+                          </Card>
+                        </CardSection>
+                    );
+                  }
+                }
+          catch (e) {
+            content.push(
+                          <CardSection>
+                            <Card>
+                              <Card.Header>Featured</Card.Header>
+                              <Card.Body>
+                                <Card.Title>No elections in zip code</Card.Title>
+                                <Card.Text>
+                                  Please check zip code to make sure it is correct.
+                                </Card.Text>
+                                <BtnSection>
+                                  <Button variant="primary">Go somewhere</Button>
+                                  <Button variant="primary">Go somewhere</Button>
+                                </BtnSection>
+                              </Card.Body>
+                            </Card>
+                          </CardSection>
+                      );
+                      console.log("error: ", e);
+                  }
+              }
+            }
+
+
+  const handleElectionCards = (event) => {
+    props.handleShowCurrentElections(event);
+
+    electionCards(props.showCurrentElections, props.values.zipCode);
   }
 
-  const buttonText = props.showCurrentElections ? 'Reset Zip Code' : 'Submit';
-  let content = null;
-
-  const handleShowLocalElections = async(event) => {
-    event.preventDefault();
-    if (props.showCurrentElections) {
-      try {
-        const electionIds = await props.electionsInZip(values.zipCode)
-        if(electionIds.length > 0 ){
-          props.handleShowCurrentElections(event);
-          content =  <CardSection>
-                    <Card show={props.showCurrentElections} onHide={props.handleShowCurrentElections}>
-                      <Card.Header>Featured</Card.Header>
-                      <Card.Body>
-                        <Card.Title>Special title treatment</Card.Title>
-                        <Card.Text>
-                          With supporting text below as a natural lead-in to additional content.
-                        </Card.Text>
-                        <BtnSection>
-                          <Button variant="primary">Go somewhere</Button>
-                          <Button variant="primary">Go somewhere</Button>
-                        </BtnSection>
-                      </Card.Body>
-                    </Card>
-                  </CardSection>
-                }
-              } catch (e) {
-                props.handleShowCurrentElections(event);
-                  <CardSection>
-                    <Card>
-                      <Card.Header>There is no Elections in this Zip Code</Card.Header>
-                    </Card>
-                  </CardSection>
-                  console.log("Error: ", e);
-        }
-      }
-    }
 
   return (
     <>
       <Form>
         <Form.Group controlId="formBasicZipCode">
           <Form.Label>Enter Your Zip Code</Form.Label>
-          <Form.Control type="number" name="zip" placeholder="Zip Code" onChange={handleInputChange} />
+          <Form.Control type="number" name="zipCode" placeholder="Zip Code" onChange={props.handleInputChange} />
         </Form.Group>
-        <Button variant="primary" type="submit" onClick={handleShowLocalElections}>
-          {buttonText}
-        </Button>
+
+        {buttonText}
       </Form>
 
       {content}

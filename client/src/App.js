@@ -92,9 +92,9 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
 
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
-        console.log("web3: ", web3);
-        console.log("Methods: ", contract.methods);
-        console.log("User: ", user);
+        // console.log("web3: ", web3);
+        // console.log("Methods: ", contract.methods);
+        // console.log("User: ", user);
         setWeb3(web3);
         setAccounts(accounts);
         setContract(contract);
@@ -142,10 +142,18 @@ const handleCloseCitizenForm = async(name, dob, zipCode, stateId) => {
                 contract={contract}
                 user={user}
                 {...routeProps}
-                />
-             }
+              />
+            }
           />
-          <Route exact strict path="/Elections" component={Elections} />
+          <Route exact strict path="/Elections" render={(routeProps) =>
+              <Elections
+                accounts={accounts}
+                contract={contract}
+                user={user}
+                {...routeProps}
+              />
+            }
+          />
           <Route exact strict path="/Results" component={Results} />
         </Switch>
       </BrowserRouter>

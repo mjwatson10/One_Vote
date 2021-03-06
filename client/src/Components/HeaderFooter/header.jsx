@@ -20,10 +20,6 @@ function Navigation(props){
             <Nav.Link href="/Elections">Elections</Nav.Link>
             <Nav.Link href="/Results">Results</Nav.Link>
           </Nav>
-          <Form inline>
-            <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-            <Button variant="outline-light">Search</Button>
-          </Form>
         </Navbar>
     </>
   );

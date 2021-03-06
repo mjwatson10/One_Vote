@@ -19,12 +19,30 @@ import Web3 from 'web3';
 
 
 function Elections(props){
+  //used to determine what elections the user can vote in
+  const [ values, setValues ] = useState({
+    zipCode: 0
+  });
+
+  const handleInputChange = (e) => {
+    setValues({
+                ...values,
+                [e.target.name]: e.target.value.trim()
+              });
+  }
+
   //used to display elections that are in the zip code that was entered as zipCode state data
   const [ showCurrentElections, setShowCurrentElections ] = useState(false);
 
   const handleShowCurrentElections = (event) => {
     event.preventDefault();
     setShowCurrentElections(oldValue => !oldValue);
+  }
+
+  const handleClearCurrentElections = (event) => {
+    event.preventDefault();
+    setShowCurrentElections(oldValue => !oldValue);
+    setValues(oldValue => 0);
   }
 
   //calls getter function on contract for all election id's associated with zip Code
@@ -46,6 +64,8 @@ function Elections(props){
                 showCurrentElections={showCurrentElections}
                 handleShowCurrentElections={handleShowCurrentElections}
                 electionsInZip={electionsInZip}
+                handleInputChange={handleInputChange}
+                values={values}
                />
 
           </header>
