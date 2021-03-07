@@ -118,6 +118,9 @@ contract OneVote is AccessControl{
     mapping(uint256 => ElectionsInZip) public allElectionIdsInZip;
     mapping(uint256 => bool) public electionIsPending;
 
+    //voting mapping
+    mapping(address => mapping(uint256 => bool)) public citizenHasVotedInElection;
+
 
 //CONSTRUCTOR
     /*    // will set access control as contract owner upon deploying contract
@@ -443,6 +446,7 @@ contract OneVote is AccessControl{
       function vote(uint256 _citizenId, uint256 voteForCandidateId, uint256 _electionId) public {
         require(citizenIndexToOwner[_citizenId] == msg.sender, "User is not owner of citizen trying to vote");
         require(addressInUse[msg.sender] == true, "This address is not eligible to vote");
+        require(citizenHasVotedInElection[msg.sender][_electionId] != true, "You have already voted in this election");
 
         Citizen memory citizen = citizenIdToCitizen[_citizenId];
         require(citizen.citizenship == true, "You are no longer a citizen");
@@ -458,6 +462,8 @@ contract OneVote is AccessControl{
         require(candidate.officeId == election.officeId && candidate.electionId == _electionId, "This candidate is not eligible for this vote");
         candidate.voteCount += 1;
 
+        //prevents citizens from voting more than once in an election
+        citizenHasVotedInElection[msg.sender][_electionId] = true;
         emit VoteCast(voteForCandidateId, _electionId, uint64(block.timestamp));
       }
 

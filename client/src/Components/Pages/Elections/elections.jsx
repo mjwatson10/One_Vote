@@ -3,8 +3,8 @@ import Proptypes from 'prop-types';
 
 import Navigation from '../../HeaderFooter/header.jsx';
 import Footer from '../../HeaderFooter/footer.jsx';
-import App from '../../../App.js';
 import YourLocalElections from './yourLocalElections.jsx';
+import App from '../../../App.js';
 
 import axios from 'axios';
 import styled from 'styled-components';
@@ -36,18 +36,23 @@ function Elections(props){
 
   const handleShowCurrentElections = (event) => {
     event.preventDefault();
+    // setShowCurrentElections(oldValue => !oldValue);
+    // setValues(oldValue => 0);
     setShowCurrentElections(oldValue => !oldValue);
+    console.log("Show: ", showCurrentElections);
   }
 
-  const handleClearCurrentElections = (event) => {
-    event.preventDefault();
+  const handleClearCurrentElections = () => {
     setShowCurrentElections(oldValue => !oldValue);
     setValues(oldValue => 0);
+    console.log("Show: ", showCurrentElections);
   }
 
   //calls getter function on contract for all election id's associated with zip Code
   const electionsInZip = async(zipCode) => {
-    await props.contract.methods.getAllElectionsInZip(zipCode).call({from: props.user});
+    const allIds = await props.contract.methods.getAllElectionsInZip(zipCode).call({from: props.user});
+    console.log("I am working", allIds);
+    return allIds;
   }
 
   return (
@@ -62,7 +67,9 @@ function Elections(props){
 
               <YourLocalElections
                 showCurrentElections={showCurrentElections}
+                setShowCurrentElections={setShowCurrentElections}
                 handleShowCurrentElections={handleShowCurrentElections}
+                handleClearCurrentElections={handleClearCurrentElections}
                 electionsInZip={electionsInZip}
                 handleInputChange={handleInputChange}
                 values={values}

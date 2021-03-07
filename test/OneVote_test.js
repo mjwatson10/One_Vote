@@ -30,7 +30,7 @@ const moment = require("moment");
 
 //creating a citizen test
     describe("creating a citizen", async() => {
-      it("should create a new citizen", async() => {
+      it.only("should create a new citizen", async() => {
         let dob = dateNeeded("May 19, 1986");
 
         const result = await voteInstance.createCitizen("Mark Watson", dob, 91423, 8372738271, {from: user});
@@ -543,24 +543,7 @@ const moment = require("moment");
         assert.equal(highest, 4);
       });
 
-      // it.only("should find the highest vote count amongst all candidates in an election", async() => {
-      //   await voteInstance.vote(1, 1, 1, {from: user});
-      //   await voteInstance.vote(2, 2, 1, {from: accounts[2]});
-      //   await voteInstance.vote(3, 4, 1, {from: accounts[3]});
-      //
-      //   await voteInstance.vote(4, 4, 1, {from: accounts[4]});
-      //   await voteInstance.vote(5, 4, 1, {from: accounts[5]});
-      //   const election = await voteInstance.getElection(1);
-      //   console.log("CandidateIds: ", election.candidateIds.toString(10));
-      //   console.log("CandidateIds: ", election.candidateIds.length.toString(10));
-      //   console.log("CandidateIds: ", election.candidateIds[3].toString(10));
-      //
-      //   //const result = await voteInstance.getIdOfWinningCandidates(1);
-      //   // console.log("Result: ", result.toString(10));
-      //   //assert.equal(result[3], 3);
-      // });
-
-      it.only("should allow admin to enter the winner of an election and emit winner event", async() => {
+      it("should allow admin to enter the winner of an election and emit winner event", async() => {
         await voteInstance.vote(1, 1, 1, {from: user});
         await voteInstance.vote(2, 2, 1, {from: accounts[2]});
         await voteInstance.vote(3, 2, 1, {from: accounts[3]});
@@ -579,7 +562,7 @@ const moment = require("moment");
         });
       });
 
-      it.only("should NOT allow winner of an election to be entered because msg.sender is not approved to do so", async() => {
+      it("should NOT allow winner of an election to be entered because msg.sender is not approved to do so", async() => {
         await voteInstance.vote(1, 1, 1, {from: user});
         await voteInstance.vote(2, 2, 1, {from: accounts[2]});
         await voteInstance.vote(3, 2, 1, {from: accounts[3]});
@@ -590,7 +573,7 @@ const moment = require("moment");
         await truffleAssert.fails(voteInstance.declareWinnerOfTestElection(2, {from: accounts[1]}));
       });
 
-      it.only("should NOT allow winner of an election to be entered because election has NOT comcluded", async() => {
+      it("should NOT allow winner of an election to be entered because election has NOT concluded", async() => {
         await voteInstance.vote(1, 1, 1, {from: user});
         await voteInstance.vote(2, 2, 1, {from: accounts[2]});
         await voteInstance.vote(3, 2, 1, {from: accounts[3]});
@@ -599,6 +582,12 @@ const moment = require("moment");
         await voteInstance.vote(5, 2, 1, {from: accounts[5]});
 
         await truffleAssert.fails(voteInstance.declareWinnerOfTestElection(2, {from: accounts[1]}));
+      });
+
+      it("shouln NOT allow a citizen to vote more than once in a particular election", async() => {
+        await voteInstance.vote(1, 1, 1, {from: user});
+
+        await truffleAssert.fails(voteInstance.vote(1, 1, 1, {from: user}));
       });
 
     });

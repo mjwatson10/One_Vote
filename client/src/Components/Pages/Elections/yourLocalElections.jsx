@@ -37,20 +37,20 @@ import Web3 from 'web3';
 
 function YourLocalElections(props){
 
-  const buttonText = props.showCurrentElections ?
-      <Button variant="primary" type="submit" onClick={props.handleClearCurrentElections}>Reset Zip Code</Button>
-      : <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>;
+  const [ electionIds, setElectionIds ] = useState([]);
 
-  let content = [];
+  // let content = [];
   //determines and display the amount of elections and election data for a citizen to vote
   const electionCards = async(show, zipCode) => {
-    if (show) {
-      try {
-        //contract call from function on election.jsx to get all electionIds
-        const allIds = await props.electionsInZip(zipCode)
+    const cards = []
 
+    if (show == false) {
+        //contract call from function on election.jsx to get all electionIds
+        const allIds = await props.electionsInZip(zipCode);
+
+      if(allIds.length > 0){
         for (var i = 0; i < allIds; i++) {
-          content.push(
+          cards.push(
                         <CardSection key={i}>
                           <Card>
                             <Card.Header>Featured</Card.Header>
@@ -68,10 +68,9 @@ function YourLocalElections(props){
                         </CardSection>
                     );
                   }
-                }
-          catch (e) {
-            content.push(
-                          <CardSection>
+                } else {
+                  cards.push(
+                          <CardSection key={props.values.zipCode}>
                             <Card>
                               <Card.Header>Featured</Card.Header>
                               <Card.Body>
@@ -87,17 +86,23 @@ function YourLocalElections(props){
                             </Card>
                           </CardSection>
                       );
-                      console.log("error: ", e);
                   }
               }
+              setElectionIds(cards);
             }
 
 
-  const handleElectionCards = (event) => {
+  const handleElectionCards = async(event) => {
+    event.preventDefault();
     props.handleShowCurrentElections(event);
 
-    electionCards(props.showCurrentElections, props.values.zipCode);
+    await props.electionsInZip(91423);
+    await electionCards(props.showCurrentElections, props.values.zipCode);
   }
+
+  const buttonText = props.showCurrentElections ?
+      <Button variant="primary" type="submit" onClick={props.handleClearCurrentElections}>Reset Zip Code</Button>
+      : <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>;
 
 
   return (
@@ -111,7 +116,7 @@ function YourLocalElections(props){
         {buttonText}
       </Form>
 
-      {content}
+      {electionIds}
     </>
   )
 }

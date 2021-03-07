@@ -45,12 +45,13 @@ function Creation(props) {
   const handleSubmitCitizenForm = async(name, dob, zipCode, stateId) => {
     setShowCitizenForm(oldValue => !oldValue);
     await props.contract.methods.createCitizen(name, dob, zipCode, stateId).send({from: props.user});
-    await props.contract.event.CitizenAdded().on('data', (event) => {
+    await props.contract.events.CitizenAdded().on('data', (event) => {
       console.log("Citizen Added: ", event.returnValues);
     });
 }
   const handleShowCitizenForm = () => {
     setShowCitizenForm(oldValue => !oldValue);
+    // console.log("events: ", props.contract.events);
   }
   const handleCloseCitizenForm = () => {
     setShowCitizenForm(oldValue => !oldValue);
@@ -63,8 +64,8 @@ function Creation(props) {
   const handleSubmitOfficeForm = async(officeTitle, zipCode, requiredAge) => {
     setShowOfficeForm(oldValue => !oldValue);
     await props.contract.methods.createOffice(officeTitle, zipCode, requiredAge).send({from: props.user});
-    await props.contract.event.OfficeAdded().on('data', (event) => {
-      console.log("Office Added: ", event.returnValues);
+    await props.contract.events.OfficeAdded().on('data', (event) => {
+      alert("Office Added: ", event.returnValues);
     });
   }
   const handleShowOfficeForm = () => {
@@ -81,7 +82,7 @@ function Creation(props) {
   const handleSubmitElectionForm = async(officeId, start, end) => {
     setShowElectionForm(oldValue => !oldValue);
     await props.contract.methods.createAnElection(officeId, start, end).send({from: props.user});
-    await props.contract.methods.ElectionAdded().on('data', (event) => {
+    await props.contract.events.ElectionAdded().on('data', (event) => {
       console.log("Election Added: ", event.returnValues);
     });
   }
@@ -99,7 +100,7 @@ function Creation(props) {
   const handleSubmitCandidateForm = async(citizenId, stateId, officeId, electionId) => {
     setShowCandidateForm(oldValue => !oldValue);
     await props.contract.methods.createCandidate(citizenId, stateId, officeId, electionId).send({from: props.user});
-    await props.contract.methids.CandidateAdded().on('data', (event) => {
+    await props.contract.events.CandidateAdded().on('data', (event) => {
       console.log("Candidate Added: ", event.returnValues);
     });
   }
