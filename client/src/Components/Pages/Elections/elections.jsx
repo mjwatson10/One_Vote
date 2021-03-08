@@ -32,7 +32,7 @@ function Elections(props){
   }
 
   //used to display elections that are in the zip code that was entered as zipCode state data
-  const [ showCurrentElections, setShowCurrentElections ] = useState(false);
+  const [ showCurrentElections, setShowCurrentElections ] = useState(true);
 
   const handleShowCurrentElections = (event) => {
     event.preventDefault();
@@ -48,12 +48,25 @@ function Elections(props){
     console.log("Show: ", showCurrentElections);
   }
 
-  //calls getter function on contract for all election id's associated with zip Code
+  //contract calls
   const electionsInZip = async(zipCode) => {
     const allIds = await props.contract.methods.getAllElectionsInZip(zipCode).call({from: props.user});
-    console.log("I am working", allIds);
+    console.log("Elections in Zip: ", allIds);
     return allIds;
   }
+
+  const electionData = async(electionId) => {
+    const data = await props.contract.methods.getElection(electionId).call({from: props.user});
+    console.log("Election Data: ", data);
+    return data;
+  }
+
+  const candidatesData = async(candidateId) => {
+    const candidate = await props.contract.methods.getCandidate(candidateId).call({from: props.user});
+
+    return candidate;
+  }
+
 
   return (
     <div className="App">
@@ -73,6 +86,8 @@ function Elections(props){
                 electionsInZip={electionsInZip}
                 handleInputChange={handleInputChange}
                 values={values}
+                electionData={electionData}
+                candidatesData={candidatesData}
                />
 
           </header>

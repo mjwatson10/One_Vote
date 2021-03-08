@@ -65,7 +65,7 @@ function Creation(props) {
     setShowOfficeForm(oldValue => !oldValue);
     await props.contract.methods.createOffice(officeTitle, zipCode, requiredAge).send({from: props.user});
     await props.contract.events.OfficeAdded().on('data', (event) => {
-      alert("Office Added: ", event.returnValues);
+      console.log("Office Added: ", event.returnValues);
     });
   }
   const handleShowOfficeForm = () => {

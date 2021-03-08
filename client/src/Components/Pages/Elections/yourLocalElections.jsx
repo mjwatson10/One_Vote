@@ -15,6 +15,8 @@ import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Card from 'react-bootstrap/Card';
 
+import moment from 'moment';
+
 import Web3 from 'web3';
 
 
@@ -42,22 +44,26 @@ function YourLocalElections(props){
   // let content = [];
   //determines and display the amount of elections and election data for a citizen to vote
   const electionCards = async(show, zipCode) => {
-    const cards = []
+    const cards = [];
+    console.log("Zip: ", zipCode);
 
-    if (show == false) {
+    if (show) {
         //contract call from function on election.jsx to get all electionIds
         const allIds = await props.electionsInZip(zipCode);
 
       if(allIds.length > 0){
-        for (var i = 0; i < allIds; i++) {
+        for (var i = 0; i < allIds.length; i++) {
+          const data = await props.electionData(allIds[i]);
           cards.push(
                         <CardSection key={i}>
                           <Card>
-                            <Card.Header>Featured</Card.Header>
+                            <Card.Header>Election For:</Card.Header>
                             <Card.Body>
-                              <Card.Title>Special title treatment</Card.Title>
+                              <Card.Title>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</Card.Title>
                               <Card.Text>
-                                With supporting text below as a natural lead-in to additional content.
+                                Election will Start on {data.electionStart}
+                                <br/>
+                                Election will End on {data.electionEnd}
                               </Card.Text>
                               <BtnSection>
                                 <Button variant="primary">Go somewhere</Button>
@@ -67,6 +73,8 @@ function YourLocalElections(props){
                           </Card>
                         </CardSection>
                     );
+                    console.log("All Ids: ", allIds);
+                    console.log("Ids Array Length: ", allIds.length);
                   }
                 } else {
                   cards.push(
@@ -87,22 +95,24 @@ function YourLocalElections(props){
                           </CardSection>
                       );
                   }
+                  setElectionIds(cards);
+                  console.log("Election Cards: ", cards);
               }
-              setElectionIds(cards);
             }
 
 
   const handleElectionCards = async(event) => {
     event.preventDefault();
     props.handleShowCurrentElections(event);
+    const moment = Date.now();
 
-    await props.electionsInZip(91423);
+    console.log("Time: ", moment);
     await electionCards(props.showCurrentElections, props.values.zipCode);
   }
 
   const buttonText = props.showCurrentElections ?
-      <Button variant="primary" type="submit" onClick={props.handleClearCurrentElections}>Reset Zip Code</Button>
-      : <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>;
+      <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>
+      :<Button variant="primary" type="submit" onClick={props.handleClearCurrentElections}>Reset Zip Code</Button> ;
 
 
   return (
