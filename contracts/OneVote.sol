@@ -417,6 +417,7 @@ contract OneVote is AccessControl{
             uint256 zipCode,
             uint64 electionStart,
             uint64 electionEnd,
+            uint256 officeId,
             uint256[] memory candidateIds
           )
         {
@@ -427,6 +428,7 @@ contract OneVote is AccessControl{
           zipCode = office.zipCode;
           electionStart = election.electionStart;
           electionEnd = election.electionEnd;
+          officeId = election.officeId;
           candidateIds = election.candidateIds;
         }
 

@@ -62,8 +62,12 @@ function YourLocalElections(props){
                               <Card.Title>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</Card.Title>
                               <Card.Text>
                                 Election will Start on {data.electionStart}
-                                <br/>
+                                <br />
                                 Election will End on {data.electionEnd}
+                                <br />
+                                Election ID: {allIds[i]}
+                                <br />
+                                Office ID: {data.officeId}
                               </Card.Text>
                               <BtnSection>
                                 <Button variant="primary">Go somewhere</Button>
@@ -99,6 +103,10 @@ function YourLocalElections(props){
                   console.log("Election Cards: ", cards);
               }
             }
+
+    const createCandidateBTN = async(candidateId) => {
+
+    }
 
 
   const handleElectionCards = async(event) => {

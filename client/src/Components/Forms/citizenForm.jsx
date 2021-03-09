@@ -67,10 +67,6 @@ function CitizenForm(props){
                             <Form.Control type="number" name="stateId" placeholder="Generate State ID" onChange={handleInputChange} required />
                           </Form.Group>
 
-                        <Button variant="primary" type="submit" id="generatorBTN">
-                        Generate State ID
-                        </Button>
-
                         <Form.Row>
                           <Form.Group as={Col} controlId="formGridZipCode">
                             <Form.Label>Zip Code</Form.Label>
