@@ -43,7 +43,7 @@ function CandidateForm(props){
         >
         <Form>
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Candidate Form</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>

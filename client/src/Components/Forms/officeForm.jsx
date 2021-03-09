@@ -42,7 +42,7 @@ function OfficeForm(props){
         >
         <Form>
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Office Form</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>

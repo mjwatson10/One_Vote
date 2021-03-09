@@ -34,7 +34,7 @@ function CitizenForm(props){
       e.preventDefault();
       const birthDate = props.dateNeeded(values.dob);
 
-      props.handleSubmitCitizenForm(values.fullName, birthDate, values.stateId, values.zipCode);
+      props.handleSubmitCitizenForm(values.fullName, birthDate, values.zipCode, values.stateId);
   }
 
         return (
@@ -46,7 +46,7 @@ function CitizenForm(props){
           >
             <Form>
                 <Modal.Header closeButton>
-                  <Modal.Title>Modal heading</Modal.Title>
+                  <Modal.Title>Citizenship Form</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
