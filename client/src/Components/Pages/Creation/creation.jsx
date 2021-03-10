@@ -33,7 +33,15 @@ const Section = styled.section`
 function Creation(props) {
   //converts dates to readable numbers for solidity
   const dateNeeded = (date) => {
-    let ageInMilliseconds = Date.parse(date) / 1000;
+    // let ageInMilliseconds = Date.parse(date) / 1000;
+    let dateTokens = date.split('-');
+
+    //creating date object from specified year, month, and day
+    let date1 = new Date(dateTokens[0], dateTokens[1] - 1, dateTokens[2]);
+
+    let ageInMilliseconds = date1.getTime();
+
+    console.log("Date1 in milliseconds: ", date1.getTime());
 
     return ageInMilliseconds;
   }

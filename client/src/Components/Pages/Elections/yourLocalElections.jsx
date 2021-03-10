@@ -32,7 +32,6 @@ import Web3 from 'web3';
     display: flex;
     flex:1;
     flex-direction:row;
-    padding:0px 40px 0px 80px;
     justify-content: space-between;
     `;
 
@@ -54,25 +53,36 @@ function YourLocalElections(props){
         for (var i = 0; i < allIds.length; i++) {
           const data = await props.electionData(allIds[i]);
           const button = await createCandidateBTN(zipCode);
-          console.log("Buttons: ", button);
-          console.log("Start: ", Date(data.electionStart));
-          console.log("End: ", Date(data.electionEnd));
+
+          let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
+          let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
+          start = start.split(' ').slice(0, 4).join(' ');
+          end = end.split(' ').slice(0, 4).join(' ');
+          console.log("Start: ", data.electionStart);
+          console.log("End: ", data.electionEnd);
 
           cards.push(
                         <CardSection key={i}>
                           <Card>
                             <Card.Header>Election For:</Card.Header>
                             <Card.Body>
-                              <Card.Title>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</Card.Title>
-                              <Card.Text>
-                                Election will Start on {`${convertedMonth(data.electionStart)}-${convertedDay(data.electionStart)}-${convertedYear(data.electionStart)}`}
+                              <h1>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</h1>
+                              <Card.Title>
+                                Election will Start on:
                                 <br />
-                                Election will End on {`${convertedMonth(data.electionEnd)}-${convertedDay(data.electionEnd)}-${convertedYear(data.electionEnd)}`}
+                                {start}
+                                <br />
+                                <br />
+                                Election will End on:
+                                <br />
+                                {end}
+                                <br />
                                 <br />
                                 Election ID: {allIds[i]}
                                 <br />
+                                <br />
                                 Office ID: {data.officeId}
-                              </Card.Text>
+                              </Card.Title>
                               <BtnSection>
                                 {button}
                               </BtnSection>
@@ -111,8 +121,7 @@ function YourLocalElections(props){
 
         candidates.push(
               <CardSection key={i}>
-              {data.name}
-              <br/>
+              <h4>{data.name[0].toUpperCase() + data.name.slice(1).toLowerCase()}</h4>
               <Button variant="primary">Vote</Button>
               </CardSection>
           );
@@ -125,33 +134,15 @@ function YourLocalElections(props){
   const handleElectionCards = async(event) => {
     event.preventDefault();
     props.handleShowCurrentElections(event);
-    const moment = Date.now();
 
-    console.log("Time: ", moment);
     await electionCards(props.showCurrentElections, props.values.zipCode);
   }
 
 
-  const convertedYear = (date) => {
-    const conversion = new Date(date);
+  const handleVote = async(event) => {
+    event.preventDefault();
 
-    return conversion.toString("MM dd");
-  }
-
-
-  const convertedMonth = (date) => {
-    const conversion = new Date(date);
-    const month = ("0" + (conversion.getMonth() + 1)).slice(-2);
-
-    return month;
-  }
-
-
-  const convertedDay = (date) => {
-    const conversion = new Date(date);
-    const day = ("0" + conversion.getDate()).slice(-2);
-
-    return day;
+    // await props.voteFor
   }
 
 

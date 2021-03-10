@@ -67,6 +67,13 @@ function Elections(props){
     return candidate;
   }
 
+  const voteFor = async(myCitizenId, voteForCandidateId, electionId) => {
+    await props.contract.methods.vote(myCitizenId, voteForCandidateId, electionId).send({from: props.user});
+    await props.contract.events.VoteCast().on('data', (event) => {
+      console.log("Vote Cast: ", event.returnValues);
+    });
+  }
+
 
   return (
     <div className="App">
@@ -88,6 +95,7 @@ function Elections(props){
                 values={values}
                 electionData={electionData}
                 candidatesData={candidatesData}
+                voteFor={voteFor}
                />
 
           </header>

@@ -32,6 +32,7 @@ function ElectionForm(props){
 
       const startDate = props.dateNeeded(values.start);
       const endDate = props.dateNeeded(values.end);
+      console.log("Date: ", values.start);
 
       props.handleSubmitElectionForm(values.officeId, startDate, endDate);
   }
