@@ -46,7 +46,6 @@ function YourLocalElections(props){
   const electionCards = async(show, zipCode) => {
     const cards = [];
     console.log("Zip: ", zipCode);
-
     if (show) {
         //contract call from function on election.jsx to get all electionIds
         const allIds = await props.electionsInZip(zipCode);
@@ -54,6 +53,11 @@ function YourLocalElections(props){
       if(allIds.length > 0){
         for (var i = 0; i < allIds.length; i++) {
           const data = await props.electionData(allIds[i]);
+          const button = await createCandidateBTN(zipCode);
+          console.log("Buttons: ", button);
+          console.log("Start: ", Date(data.electionStart));
+          console.log("End: ", Date(data.electionEnd));
+
           cards.push(
                         <CardSection key={i}>
                           <Card>
@@ -61,17 +65,16 @@ function YourLocalElections(props){
                             <Card.Body>
                               <Card.Title>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</Card.Title>
                               <Card.Text>
-                                Election will Start on {data.electionStart}
+                                Election will Start on {`${convertedMonth(data.electionStart)}-${convertedDay(data.electionStart)}-${convertedYear(data.electionStart)}`}
                                 <br />
-                                Election will End on {data.electionEnd}
+                                Election will End on {`${convertedMonth(data.electionEnd)}-${convertedDay(data.electionEnd)}-${convertedYear(data.electionEnd)}`}
                                 <br />
                                 Election ID: {allIds[i]}
                                 <br />
                                 Office ID: {data.officeId}
                               </Card.Text>
                               <BtnSection>
-                                <Button variant="primary">Go somewhere</Button>
-                                <Button variant="primary">Go somewhere</Button>
+                                {button}
                               </BtnSection>
                             </Card.Body>
                           </Card>
@@ -90,10 +93,6 @@ function YourLocalElections(props){
                                 <Card.Text>
                                   Please check zip code to make sure it is correct.
                                 </Card.Text>
-                                <BtnSection>
-                                  <Button variant="primary">Go somewhere</Button>
-                                  <Button variant="primary">Go somewhere</Button>
-                                </BtnSection>
                               </Card.Body>
                             </Card>
                           </CardSection>
@@ -104,8 +103,22 @@ function YourLocalElections(props){
               }
             }
 
-    const createCandidateBTN = async(candidateId) => {
+    const createCandidateBTN = async(zipCode) => {
+      const candidates = [];
+      const allIds = await props.electionsInZip(zipCode);
+      for (var i = 0; i < allIds.length; i++) {
+        const data = await props.candidatesData(allIds[i]);
 
+        candidates.push(
+              <CardSection key={i}>
+              {data.name}
+              <br/>
+              <Button variant="primary">Vote</Button>
+              </CardSection>
+          );
+      }
+      console.log("Candidate: ", candidates);
+      return candidates;
     }
 
 
@@ -117,6 +130,30 @@ function YourLocalElections(props){
     console.log("Time: ", moment);
     await electionCards(props.showCurrentElections, props.values.zipCode);
   }
+
+
+  const convertedYear = (date) => {
+    const conversion = new Date(date);
+
+    return conversion.toString("MM dd");
+  }
+
+
+  const convertedMonth = (date) => {
+    const conversion = new Date(date);
+    const month = ("0" + (conversion.getMonth() + 1)).slice(-2);
+
+    return month;
+  }
+
+
+  const convertedDay = (date) => {
+    const conversion = new Date(date);
+    const day = ("0" + conversion.getDate()).slice(-2);
+
+    return day;
+  }
+
 
   const buttonText = props.showCurrentElections ?
       <Button variant="primary" type="submit" onClick={handleElectionCards}>Submit</Button>
