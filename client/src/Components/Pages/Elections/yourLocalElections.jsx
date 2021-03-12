@@ -197,7 +197,7 @@ function YourLocalElections(props){
     }
 
     const handleVote = async() => {
-      await props.voteFor(candidateId, electionId);
+      await props.voteFor(candidateValues.candidateId, candidateValues.electionId);
       console.log("You Voted!!!");
     }
 
