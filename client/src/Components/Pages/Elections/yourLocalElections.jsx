@@ -39,111 +39,175 @@ import Web3 from 'web3';
 function YourLocalElections(props){
 
   const [ electionIds, setElectionIds ] = useState([]);
+  const [ candidateValues, setCandidateValues ] = useState({
+    key: 0,
+    candidateId: 0,
+    electionId: 0
+  });
 
-  // let content = [];
-  //determines and display the amount of elections and election data for a citizen to vote
-  const electionCards = async(show, zipCode) => {
-    const cards = [];
-    console.log("Zip: ", zipCode);
-    if (show) {
-        //contract call from function on election.jsx to get all electionIds
-        const allIds = await props.electionsInZip(zipCode);
-
-      if(allIds.length > 0){
-        for (var i = 0; i < allIds.length; i++) {
-          const data = await props.electionData(allIds[i]);
-          const button = await createCandidateBTN(zipCode);
-
-          let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
-          let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
-          start = start.split(' ').slice(0, 4).join(' ');
-          end = end.split(' ').slice(0, 4).join(' ');
-          console.log("Start: ", data.electionStart);
-          console.log("End: ", data.electionEnd);
-
-          cards.push(
-                        <CardSection key={i}>
-                          <Card>
-                            <Card.Header>Election For:</Card.Header>
-                            <Card.Body>
-                              <h1>{data.officeTitle[0].toUpperCase() + data.officeTitle.slice(1).toLowerCase()}</h1>
-                              <Card.Title>
-                                Election will Start on:
-                                <br />
-                                {start}
-                                <br />
-                                <br />
-                                Election will End on:
-                                <br />
-                                {end}
-                                <br />
-                                <br />
-                                Election ID: {allIds[i]}
-                                <br />
-                                <br />
-                                Office ID: {data.officeId}
-                              </Card.Title>
-                              <BtnSection>
-                                {button}
-                              </BtnSection>
-                            </Card.Body>
-                          </Card>
-                        </CardSection>
-                    );
-                    console.log("All Ids: ", allIds);
-                    console.log("Ids Array Length: ", allIds.length);
-                  }
-                } else {
-                  cards.push(
-                          <CardSection key={props.values.zipCode}>
-                            <Card>
-                              <Card.Header>Featured</Card.Header>
-                              <Card.Body>
-                                <Card.Title>No elections in zip code</Card.Title>
-                                <Card.Text>
-                                  Please check zip code to make sure it is correct.
-                                </Card.Text>
-                              </Card.Body>
-                            </Card>
-                          </CardSection>
-                      );
-                  }
-                  setElectionIds(cards);
-                  console.log("Election Cards: ", cards);
-              }
-            }
-
-    const createCandidateBTN = async(zipCode) => {
-      const candidates = [];
-      const allIds = await props.electionsInZip(zipCode);
-      for (var i = 0; i < allIds.length; i++) {
-        const data = await props.candidatesData(allIds[i]);
-
-        candidates.push(
-              <CardSection key={i}>
-              <h4>{data.name[0].toUpperCase() + data.name.slice(1).toLowerCase()}</h4>
-              <Button variant="primary">Vote</Button>
-              </CardSection>
-          );
+//capitalizes names and office titles
+  const capitalize = (string) => {
+    const words = string.split(" ");
+      for (let i = 0; i < words.length; i++) {
+          words[i] = words[i][0].toUpperCase() + words[i].substr(1);
       }
-      console.log("Candidate: ", candidates);
-      return candidates;
+      return words.join(" ");
     }
 
 
-  const handleElectionCards = async(event) => {
-    event.preventDefault();
-    props.handleShowCurrentElections(event);
 
-    await electionCards(props.showCurrentElections, props.values.zipCode);
-  }
+    // let content = [];
+    //determines and display the amount of elections and election data for a citizen to vote
+    const electionCards = async(show, zipCode) => {
+      const cards = [];
+      console.log("Zip: ", zipCode);
+      if (show) {
+          //contract call from function on election.jsx to get all electionIds
+          const allIds = await props.electionsInZip(zipCode);
+
+        if(allIds.length > 0){
+          for (var i = 0; i < allIds.length; i++) {
+            //get all data from a particular election, ie all candidates Id's in an election
+            const data = await props.electionData(allIds[i]);
+
+              //generates a button for all candidates in a particular election
+              const button = await createCandidateBtn(data.candidateIds, allIds[i]);
+              console.log("Candidate Array: ", data.candidateIds);
+
+            //needs to determine whether or not there are candidates running in a particular election
+            if(data.candidateIds.length > 0){
+              let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
+              let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
+              start = start.split(' ').slice(0, 4).join(' ');
+              end = end.split(' ').slice(0, 4).join(' ');
+              console.log("Start: ", data.electionStart);
+              console.log("End: ", data.electionEnd);
+
+              cards.push(
+                            <CardSection key={i}>
+                              <Card>
+                                <Card.Header>Election For:</Card.Header>
+                                <Card.Body>
+                                  <h1>{capitalize(data.officeTitle)}</h1>
+                                  <Card.Title>
+                                    Election will Start on:
+                                    <br />
+                                    {start}
+                                    <br />
+                                    <br />
+                                    Election will End on:
+                                    <br />
+                                    {end}
+                                    <br />
+                                    <br />
+                                    Election ID: {allIds[i]}
+                                    <br />
+                                    <br />
+                                    Office ID: {data.officeId}
+                                  </Card.Title>
+                                  <BtnSection>
+                                    {button}
+                                  </BtnSection>
+                                </Card.Body>
+                              </Card>
+                            </CardSection>
+                        );
+                        console.log("All Ids: ", allIds);
+                        console.log("Ids Array Length: ", allIds.length);
+                      } else {
+                        let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
+                        let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
+                        start = start.split(' ').slice(0, 4).join(' ');
+                        end = end.split(' ').slice(0, 4).join(' ');
+                        console.log("Start: ", data.electionStart);
+                        console.log("End: ", data.electionEnd);
+
+                        cards.push(
+                                      <CardSection key={i}>
+                                        <Card>
+                                          <Card.Header>Election For:</Card.Header>
+                                          <Card.Body>
+                                            <h1>{capitalize(data.officeTitle)}</h1>
+                                            <Card.Title>
+                                              Election will Start on:
+                                              <br />
+                                              {start}
+                                              <br />
+                                              <br />
+                                              Election will End on:
+                                              <br />
+                                              {end}
+                                              <br />
+                                              <br />
+                                              Election ID: {allIds[i]}
+                                              <br />
+                                              <br />
+                                              Office ID: {data.officeId}
+                                            </Card.Title>
+                                            <BtnSection>
+                                              <h4>No Candidates</h4>
+                                            </BtnSection>
+                                          </Card.Body>
+                                        </Card>
+                                      </CardSection>
+                                  );
+                      }
+                    }
+                  } else {
+                    cards.push(
+                            <CardSection key={props.values.zipCode}>
+                              <Card>
+                                <Card.Header>Featured</Card.Header>
+                                <Card.Body>
+                                  <Card.Title>No elections in zip code</Card.Title>
+                                  <Card.Text>
+                                    Please check zip code to make sure it is correct.
+                                  </Card.Text>
+                                </Card.Body>
+                              </Card>
+                            </CardSection>
+                        );
+                    }
+                    setElectionIds(cards);
+                    console.log("Election Cards: ", cards);
+                }
+              }
+
+    //creates btn that allows users to vote in election
+    const createCandidateBtn = async(candidatesArray, electionId) => {
+      const btnArray = [];
+
+        for (var i = 0; i < candidatesArray.length; i++) {
+            const data = await props.candidatesData(candidatesArray[i]);
+            setCandidateValues({
+              key: data.candidateIds[i],
+              candidateId: data.candidateIds[i],
+              electionId: electionId
+            });
+
+            btnArray.push(
+                  <CardSection key={i}>
+                  <h4>{capitalize(data.name)}</h4>
+                  <Button variant="primary" onClick={handleVote}>Vote</Button>
+                  </CardSection>
+              );
+        }
+      console.log("Candidate: ", btnArray);
+      return btnArray;
+    }
+
+    const handleVote = async() => {
+      await props.voteFor(candidateId, electionId);
+      console.log("You Voted!!!");
+    }
 
 
-  const handleVote = async(event) => {
-    event.preventDefault();
+    const handleElectionCards = async(event) => {
+      event.preventDefault();
+      props.handleShowCurrentElections(event);
 
-    // await props.voteFor
-  }
+      await electionCards(props.showCurrentElections, props.values.zipCode);
+    }
 
 
   const buttonText = props.showCurrentElections ?

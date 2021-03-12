@@ -24,6 +24,13 @@ function Elections(props){
     zipCode: 0
   });
 
+  const timeInMilliseconds = () => {
+      const date = new Date();
+      const millisec = date.getTime();
+
+    return millisec;
+  }
+
   const handleInputChange = (e) => {
     setValues({
                 ...values,
@@ -67,7 +74,8 @@ function Elections(props){
     return candidate;
   }
 
-  const voteFor = async(myCitizenId, voteForCandidateId, electionId) => {
+  const voteFor = async(voteForCandidateId, electionId) => {
+    const myCitizenId = await props.contract.methods.getCitizenId(props.user).call({from:props.user});
     await props.contract.methods.vote(myCitizenId, voteForCandidateId, electionId).send({from: props.user});
     await props.contract.events.VoteCast().on('data', (event) => {
       console.log("Vote Cast: ", event.returnValues);
@@ -96,6 +104,7 @@ function Elections(props){
                 electionData={electionData}
                 candidatesData={candidatesData}
                 voteFor={voteFor}
+                timeInMilliseconds={timeInMilliseconds}
                />
 
           </header>
