@@ -14,8 +14,7 @@ import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Card from 'react-bootstrap/Card';
-
-import moment from 'moment';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 import Web3 from 'web3';
 
@@ -26,6 +25,14 @@ import Web3 from 'web3';
       color: black;
       text-align: center;
       padding: 40px;
+    `;
+
+  const VoteSection = styled.section`
+      width: 600px;
+      max-width: 600px;
+      color: black;
+      text-align: justify;
+      padding: 20px;
     `;
 
   const BtnSection = styled.section`
@@ -72,12 +79,11 @@ function YourLocalElections(props){
 
               //generates a button for all candidates in a particular election
               const button = await createCandidateBtn(data.candidateIds, allIds[i]);
-              console.log("Candidate Array: ", data.candidateIds);
 
             //needs to determine whether or not there are candidates running in a particular election
             if(data.candidateIds.length > 0){
-              let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
-              let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
+              let start = new Date(parseInt((data.electionStart * 1000), 10)).toUTCString();
+              let end = new Date(parseInt((data.electionEnd * 1000), 10)).toUTCString();
               start = start.split(' ').slice(0, 4).join(' ');
               end = end.split(' ').slice(0, 4).join(' ');
               console.log("Start: ", data.electionStart);
@@ -105,9 +111,9 @@ function YourLocalElections(props){
                                     <br />
                                     Office ID: {data.officeId}
                                   </Card.Title>
-                                  <BtnSection>
+
                                     {button}
-                                  </BtnSection>
+
                                 </Card.Body>
                               </Card>
                             </CardSection>
@@ -115,8 +121,8 @@ function YourLocalElections(props){
                         console.log("All Ids: ", allIds);
                         console.log("Ids Array Length: ", allIds.length);
                       } else {
-                        let start = new Date(parseInt(data.electionStart, 10)).toUTCString();
-                        let end = new Date(parseInt(data.electionEnd, 10)).toUTCString();
+                        let start = new Date(parseInt((data.electionStart * 1000), 10)).toUTCString();
+                        let end = new Date(parseInt((data.electionEnd * 1000), 10)).toUTCString();
                         start = start.split(' ').slice(0, 4).join(' ');
                         end = end.split(' ').slice(0, 4).join(' ');
                         console.log("Start: ", data.electionStart);
@@ -178,28 +184,54 @@ function YourLocalElections(props){
       const btnArray = [];
 
         for (var i = 0; i < candidatesArray.length; i++) {
-            const data = await props.candidatesData(candidatesArray[i]);
-            setCandidateValues({
-              key: data.candidateIds[i],
-              candidateId: data.candidateIds[i],
-              electionId: electionId
-            });
+            const candidateId = candidatesArray[i]
+            const data = await props.candidatesData(candidateId);
+            // setCandidateValues({
+            //   key: data.candidateIds[i],
+            //   candidateId: data.candidateIds[i],
+            //   electionId: electionId
+            // });
+
+            const handleVote = async() => {
+              await props.voteFor(candidateId, electionId);
+              console.log("You Voted!!!");
+              console.log("CandidateId Voted For: ", candidateId);
+              console.log("ElectionId Voted For: ", electionId);
+              console.log("Data: ", data);
+              // console.log("Candidate Id: ", candidateValues.candidateId);
+              // console.log("Election Id: ", candidateValues.electionId);
+            }
 
             btnArray.push(
-                  <CardSection key={i}>
+                  <VoteSection key={i}>
                   <h4>{capitalize(data.name)}</h4>
                   <Button variant="primary" onClick={handleVote}>Vote</Button>
-                  </CardSection>
+                  </VoteSection>
+                  // <>
+                  // <CardSection key={i}>
+                  //     <InputGroup>
+                  //       <InputGroup.Prepend>
+                  //         <InputGroup.Checkbox id={data.name} value={candidatesArray[i]} />
+                  //         <label htmlFor={data.name}>{data.name}</label>
+                  //       </InputGroup.Prepend>
+                  //     </InputGroup>
+                  // </CardSection>
+                  // <br />
+                  // </>
               );
         }
       console.log("Candidate: ", btnArray);
       return btnArray;
     }
 
-    const handleVote = async() => {
-      await props.voteFor(candidateValues.candidateId, candidateValues.electionId);
-      console.log("You Voted!!!");
-    }
+    // const handleVote = async(candidateId, electionId) => {
+    //   // await props.voteFor();
+    //   console.log("You Voted!!!");
+    //   console.log("CandidateId Voted For: ", candidateId);
+    //   console.log("ElectionId Voted For: ", electionId);
+    //   // console.log("Candidate Id: ", candidateValues.candidateId);
+    //   // console.log("Election Id: ", candidateValues.electionId);
+    // }
 
 
     const handleElectionCards = async(event) => {

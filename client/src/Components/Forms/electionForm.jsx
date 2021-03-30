@@ -85,11 +85,11 @@ function ElectionForm(props){
 
       <Card style={{ width: '18rem', margin: '15px'}}>
         <Card.Body>
-          <Card.Title style={{ color: 'black'}}>Create Election</Card.Title>
-          <Card.Text style={{ color: 'black'}}>
-            This will allow you to create an Election to vote in.
+          <Card.Title style={{ color: 'black'}}><h3>Create Election</h3></Card.Title>
+          <Card.Text style={{ color: 'black', fontSize:'20px' }}>
+            <span>This will allow you to create an Election to vote in.</span>
           </Card.Text>
-            <Button variant="primary" type="submit" onClick={props.handleShowElectionForm}>
+            <Button variant="primary" type="submit" onClick={props.handleShowElectionForm} style={{ marginBottom: '-60px' }}>
             Eelection Form
             </Button>
           </Card.Body>

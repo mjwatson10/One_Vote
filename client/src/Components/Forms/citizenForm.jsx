@@ -90,11 +90,11 @@ function CitizenForm(props){
 
           <Card style={{ width: '18rem', margin: '15px'}}>
             <Card.Body>
-              <Card.Title style={{ color: 'black'}}>Create Citizen</Card.Title>
-              <Card.Text style={{ color: 'black'}}>
-                This will allow you to create a Citizen who can vote in an Election.
+              <Card.Title style={{ color: 'black'}}><h3>Create Citizen</h3></Card.Title>
+              <Card.Text style={{ color: 'black', fontSize: '20px' }}>
+                <span>This will allow you to create a Citizen who can vote in an Election.</span>
               </Card.Text>
-                <Button variant="primary" type="submit" onClick={props.handleShowCitizenForm}>
+                <Button variant="primary" type="submit" onClick={props.handleShowCitizenForm} style={{ marginBottom: '-5px' }}>
                 Citizen Form
                 </Button>
               </Card.Body>

@@ -82,11 +82,11 @@ function OfficeForm(props){
 
         <Card style={{ width: '18rem', margin: '15px'}}>
           <Card.Body>
-            <Card.Title style={{ color: 'black'}}>Create Office</Card.Title>
-            <Card.Text style={{ color: 'black'}}>
-              This will allow you to create an Office for an Election.
+            <Card.Title style={{ color: 'black'}}><h3>Create Office</h3></Card.Title>
+            <Card.Text style={{ color: 'black', fontSize: '20px' }}>
+              <span>This will allow you to create an Office for an Election.</span>
             </Card.Text>
-              <Button variant="primary" type="submit" onClick={props.handleShowOfficeForm}>
+              <Button variant="primary" type="submit" onClick={props.handleShowOfficeForm} style={{ marginBottom: '-60px' }}>
               Office Form
               </Button>
             </Card.Body>

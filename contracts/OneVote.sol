@@ -454,6 +454,7 @@ contract OneVote is AccessControl{
         require(citizen.citizenship == true, "You are no longer a citizen");
 
         Election memory election = elections[_electionId];
+        //block.timestamp is measured in seconds
         require(election.electionStart <= uint64(block.timestamp), "The election has not opened yet");
         require(election.electionEnd >= uint64(block.timestamp), "The election is no longer open");
 
